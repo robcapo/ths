@@ -8,11 +8,8 @@ classdef StreamingData < handle
 
 properties (SetAccess = protected)
     tMax = 1;   % This is the maximum value of t that can be specified by `sample`
-    dt = 0.01;  % The amount that 
     y;          % This is a Cx1 vector of possible class labels
     d;          % A scalar specifying the number of dimensions
-    N;          % A scalar specifying the number of observations drawn up to this point
-    t;          % A scalar specifying the time of the last drawn sample
 end
 
 methods (Abstract = true)
