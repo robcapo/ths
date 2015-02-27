@@ -8,9 +8,7 @@ classdef RotatingGaussians < StreamingData
     %   Date: July, 2014
     
     properties (SetAccess = protected)
-        d = 2;                  % 2d dataset
         initialAngles = [];     % holds the initial angles of each class
-        rotationFns = {};       % holds a cell array of functions that specify the rate at which each class rotates
         covariances = {};       % holds the covariances of each distribution
         rotationRates = [];     % holds the average rate (RPS) at which each distribution rotates
         radius = 5;             % holds the radius of the circle that the Gaussian's will rotate in
@@ -21,10 +19,11 @@ classdef RotatingGaussians < StreamingData
         function obj = RotatingGaussians(n)
             if nargin < 1, n = 2; end
             obj.y = (1:n)';
+            obj.d = 2;
 
-            obj.initialAngles = linspace(2*pi/n, 2*pi, n);
+            obj.initialAngles = linspace(2*pi/n, 2*pi, n)';
 
-            obj.covariances = cell(size(y));
+            obj.covariances = cell(size(obj.y));
             obj.covariances(:) = {[1 0; 0 1]};
             
             obj.rotationRates = ones(size(obj.y));
@@ -33,23 +32,28 @@ classdef RotatingGaussians < StreamingData
             obj.radius = 5;
 
             obj.priors = ones(size(obj.y)) / n;
-            
-            obj.setNumberOfDistributions(n);
         end
 
         function [x, y] = sample(obj, t, y)
-            if nargin < 3, y = obj.chooseClass(); end
-            if nargin < 2, t = 0; end
+            if nargin < 3
+                inds = round((length(obj.y) - 1)*rand(size(t))+1);
+                y = obj.y(inds);
+            end
             
-            angle = obj.rotateLin(obj.initialAngles(y), rotationRates(y), t);
+            angle = obj.rotateLin(t, obj.initialAngles(inds), obj.rotationRates(inds));
             mu = [obj.radius*cos(angle), obj.radius*sin(angle)];
-            x = mvnrnd(mu, obj.covariances{y}, 1);
+            
+            x = zeros(length(inds), obj.d);
+            
+            for i = 1:length(inds)
+                x(i, :) = mvnrnd(mu(i, :), obj.covariances{inds(i)}, 1);
+            end
         end
     end
     
     methods (Static)
-        function theta = rotateLin(initialAngle, t, rate)
-            theta = initialAngle+t*rate;
+        function theta = rotateLin(t, initialAngle, rate)
+            theta = initialAngle+t.*rate*2*pi;
         end
     end
     
