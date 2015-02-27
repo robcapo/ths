@@ -3,16 +3,18 @@ function [ results ] = run_online_experiment( datastream, classifier, plotter, o
 %   Detailed explanation goes here
 
 if nargin < 4, opts = struct; end
+if nargin < 3, plotter = []; end
+if nargin < 2, classifier = []; end
 
 if ~isa(datastream, 'StreamingData')
     error('run_online_experiment:BadStream', 'The first argument to the constructor must be a StreamingData object');
 end
 
-if ~isa(classifier, 'ClassifierModel')
+if ~isa(classifier, 'ClassifierModel') && ~isempty(classifier)
     error('run_online_experiment:BadClassifier', 'The second argument to my constructor must be a ClassifierModel object');
 end
 
-if ~isa(plotter, 'Plotter')
+if ~isa(plotter, 'Plotter') && ~isempty(plotter)
     error('run_online_experiment:BadPlotter', 'The second argument to my constructor must be a ClassifierModel object');
 end
 
@@ -48,7 +50,9 @@ results.t = t(1:opts.Ntr + 1:end);
 
 [results.X_tr, results.y_tr] = datastream.sample(results.t_tr);
 
-classifier.train(results.X_tr, results.y_tr, results.t_tr);
+if ~isempty(classifier)
+    classifier.train(results.X_tr, results.y_tr, results.t_tr);
+end
 
 results.X = zeros(length(results.t), size(results.X_tr, 2));
 results.h = zeros(size(results.t));
@@ -57,9 +61,22 @@ results.dur = zeros(size(results.t));
 [results.X, results.y] = datastream.sample(results.t);
 
 for i = 1:length(results.t)
-    tStart = tic;
-    results.h(i) = classifier.classify(results.X(i, :), results.t(i));
-    results.dur(i) = toc(tStart);
+    % classify
+    if ~isempty(classifier)
+        tStart = tic;
+        results.h(i) = classifier.classify(results.X(i, :), results.t(i));
+        results.dur(i) = toc(tStart);
+    end
+    
+    % plot
+    if ~isempty(plotter)
+        if isempty(classifier)
+            y = results.y(i);
+        else
+            y = results.h(i);
+        end
+        plotter.plot(results.X(i, :), y, results.t(i));
+    end
 end
 
 
