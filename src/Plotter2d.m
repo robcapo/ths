@@ -10,69 +10,53 @@ classdef Plotter2d < StreamPlotter
         xlims = [Inf -Inf];
         ylims = [Inf -Inf];
         plotPoints;
+        i = 1; % the total number of plotted points so far (used to update plotPoints)
     end
     
     methods
-        function obj = Plotter2d(ax, opts)
-            if nargin < 1, ax = gca; end
+        function obj = Plotter2d(opts)
+            if nargin < 1, opts = struct; end
             
-            
-            obj.axh = ax;
-            
-            if nargin >= 2
-                if isfield(opts, 'n'), obj.n = opts.n; end
-                if isfield(opts, 'colors'), obj.colors = opts.colors; end
+            if isfield(opts, 'axh')
+                obj.axh = opts.axh;
+            else
+                obj.axh = gca;
             end
+            
+            if isfield(opts, 'n'), obj.n = opts.n; end
+            if isfield(opts, 'colors'), obj.colors = opts.colors; end
             
             if obj.n > 0
                 obj.plotPoints = zeros(obj.n, 1);
             end
         end
         
-        function plot(obj, X, y, t)
+        function plot(obj, X, c)
             if nargin < 4, t = 0; end
+            if nargin < 3, y = 1; end
+            
             if size(X, 2) > 2, warning('Warning: x is more than 2 dimensions, this class only plots on a 2D axis'); end
+            
             axes(obj.axh);
             hold on;
             
-            % Adjust x and y limits if needed
-            mins = min(X, [], 1);
-            maxs = max(X, [], 1);
+            colors = obj.colors(mod(c - 1, length(obj.colors)) + 1, :);
             
-            changeLims = 0;
+            h = scatter(X(:, 1), X(:, 2), 25, colors, 'filled');
             
-            if mins(1) < obj.xlims(1)
-                obj.xlims(1) = mins(1);
-                changeLims = 1;
+            if ~isempty(obj.n)
+                ind = mod(obj.i - 1, obj.n) + 1;
+                if obj.plotPoints(ind) ~= 0
+                    delete(obj.plotPoints(ind));
+                end
+                
+                obj.plotPoints(ind) = h;
             end
-            
-            if maxs(1) > obj.xlims(2)
-                obj.xlims(2) = maxs(1);
-                changeLims = 1;
-            end
-            
-            if mins(2) < obj.ylims(1)
-                obj.ylims(1) = mins(2);
-                changeLims = 1;
-            end
-            
-            if maxs(2) > obj.ylims(2)
-                obj.ylims(2) = maxs(2);
-                changeLims = 1;
-            end
-            
-            if changeLims == 1
-                ylim(obj.ylims);
-                xlim(obj.xlims);
-            end
-            
-            colors = obj.colors(mod(y, length(obj.colors)) + 1, :);
-            
-            scatter(X(:, 1), X(:, 2), 25, colors, 'filled');
             
             title(['Time ' num2str(t)]);
             hold off;
-            getframe;
+            
+            obj.i = obj.i + 1;
         end
     end
     

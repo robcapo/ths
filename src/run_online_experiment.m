@@ -14,8 +14,8 @@ if ~isa(classifier, 'ClassifierModel') && ~isempty(classifier)
     error('run_online_experiment:BadClassifier', 'The second argument to my constructor must be a ClassifierModel object');
 end
 
-if ~isa(plotter, 'Plotter') && ~isempty(plotter)
-    error('run_online_experiment:BadPlotter', 'The second argument to my constructor must be a ClassifierModel object');
+if ~isa(plotter, 'StreamPlotter') && ~isempty(plotter)
+    error('run_online_experiment:BadPlotter', 'The third argument to my constructor must be a StreamPlotter object');
 end
 
 if isempty(datastream.tMax)
@@ -32,21 +32,23 @@ defaultOpts.Ntr = 20000;
 % defaultOpts.resultsDirectory = ['results' datestr(now, 'yyyy-mm-dd/HHMM/')];
 
 % fill in default options to opts
-for i = fieldnames(defaultOpts)
-    if ~isfield(opts, i)
-        opts.(i) = defaultOpts.(i);
+fields = fieldnames(defaultOpts);
+for i = 1:length(fields)
+    if ~isfield(opts, fields{i})
+        opts.(fields{i}) = defaultOpts.(fields{i});
     end
 end
 
 disp(['Experiment started at: ' datestr(now, 'HH:MM AM on mmm dd, yyyy')]);
-disp(['Options: ', opts]);
+disp('Options:');
+disp(opts);
 
 results = struct;
 
-t = linspace(0, classifier.tMax, opts.N + opts.Ntr);
+t = linspace(0, datastream.tMax, opts.N + opts.Ntr);
 
-results.t_tr = t(1:opts.Ntr);
-results.t = t(1:opts.Ntr + 1:end);
+results.t_tr = t(1:opts.Ntr)';
+results.t = t(opts.Ntr + 1:end)';
 
 [results.X_tr, results.y_tr] = datastream.sample(results.t_tr);
 
@@ -75,7 +77,8 @@ for i = 1:length(results.t)
         else
             y = results.h(i);
         end
-        plotter.plot(results.X(i, :), y, results.t(i));
+        plotter.plot(results.X(i, :), y);
+        getframe;
     end
 end
 
