@@ -3,13 +3,13 @@ classdef PosteriorClassifierModel < ClassifierModel
     %   Detailed explanation goes here
 
     methods (Abstract = true)
-        H = posterior(X)
-        train(X, Y)
+        train(obj, X, Y, t)
+        H = posterior(obj, X, t)
     end
     
     methods
-        function h = classify(obj, X)
-            [~, h] = max(obj.posterior(X));
+        function h = classify(obj, X, t)
+            [~, h] = max(obj.posterior(X, t));
         end
     end
 end
