@@ -7,9 +7,9 @@ classdef StreamingData < handle
 %   Date: July, 2014
 
 properties (SetAccess = protected)
-    tMax = 1;   % This is the maximum value of t that can be specified by `sample`
-    y;          % This is a Cx1 vector of possible class labels
-    d;          % A scalar specifying the number of dimensions
+    tMax;   % This is the maximum value of t that can be specified by `sample`
+    y;      % This is a Cx1 vector of possible class labels
+    d;      % A scalar specifying the number of dimensions
 end
 
 methods (Abstract = true)
