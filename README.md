@@ -57,11 +57,9 @@ classifier.
 ### ForgettingKnnClassifier
 __Constructor__: `obj = ForgettingKnnClassifier(opts)`
 `opts` is a `struct` with the following fields:
-=======================
-| Field | Description |
-=======================
-| rowPadding | The number of rows to grow the resizable array X when it gets full (_default_: 500) |
-| k          | The number of nearest neighbors to consider (_default_: 25) |
-| beta       | The forgetting rate over time (_default_: .1) |
-==========================
 
+Field        | Description 
+-------------|------------------------------------------------------------------------------------
+`rowPadding` | The number of rows to grow the resizable array `X` when it gets full (_default_: `500`) 
+`k`          | The number of nearest neighbors to consider (_default_: `25`) 
+`beta`       | The forgetting rate over time (_default_: `.1`) 
