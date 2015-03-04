@@ -6,9 +6,8 @@
 % opts struct
 % .N: number of observations to classify
 % .Ntr: number of observations to initially classify
-% .debug: whether to output debug information
 % .statsEveryN: report statistics every N samples classified
-function [ results ] = run_online_experiment( datastream, classifier, plotter, opts )
+function [ results, opts ] = run_online_experiment( datastream, classifier, plotter, opts )
 %RUN_ONLINE_EXPERIMENT Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -34,9 +33,8 @@ end
 
 
 defaultOpts = struct;
-defaultOpts.N = 100000;
-defaultOpts.Ntr = 20000;
-defaultOpts.debug = 1;
+defaultOpts.N = 1000;
+defaultOpts.Ntr = 100;
 defaultOpts.statsEveryN = 100;
 % defaultOpts.nFolds = 10;
 % defaultOpts.nCores = 1;
@@ -54,20 +52,28 @@ end
 disp(['Experiment started at: ' datestr(now, 'HH:MM AM on mmm dd, yyyy')]);
 disp('Options:');
 disp(opts);
+disp('Dataset:');
+disp(datastream);
+disp('Classifier:');
+disp(classifier);
+disp('Plotter:');
+disp(plotter);
 
 results = struct;
 
 t = linspace(0, datastream.tMax, opts.N + opts.Ntr);
 
 results.t_tr = t(1:opts.Ntr)';
-results.t = t(opts.Ntr + 1:end)';
 
 [results.X_tr, results.y_tr] = datastream.sample(results.t_tr);
 
 if ~isempty(classifier)
+    z = tic;
     classifier.train(results.X_tr, results.y_tr, results.t_tr);
+    disp(['Training took: ' num2str(toc(z)) 's']);
 end
 
+results.t = t(opts.Ntr + 1:end)';
 results.X = zeros(length(results.t), size(results.X_tr, 2));
 results.h = zeros(size(results.t));
 results.dur = zeros(size(results.t));
@@ -96,22 +102,16 @@ for i = 1:length(results.t)
     end
 end
 
-
-    function debug(varargin)
-        if opts.debug == 1
-            varargin{:}
-        end
-    end
-
     function time(i)
         if mod(i, opts.statsEveryN) == 0
+            disp('--');
             disp(['t: ' num2str(results.t(i))]);
-            disp(['i: ' num2str(i)]);
+            disp(['N: ' num2str(i)]);
             disp(['Last ' num2str(opts.statsEveryN) ' steps took ' ...
-                num2str(sum(results.t(i-opts.statsEveryN+1:i))) 's ' ...
-                '(' num2str(mean(results.t(i-opts.statsEveryN+1:i))) ' avg)']);
+                num2str(sum(results.dur(i-opts.statsEveryN+1:i))) 's ' ...
+                '(' num2str(mean(results.dur(i-opts.statsEveryN+1:i))) ' avg)']);
             disp(['Current performance: ' ...
-                num2str(sum(results.h(1:i) == results.y(1:i)) / i)]);
+                num2str(sum(results.h(1:i) == results.y(1:i)) * 100/ i) '%']);
         end
     end
 
