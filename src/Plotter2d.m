@@ -32,8 +32,7 @@ classdef Plotter2d < StreamPlotter
         end
         
         function plot(obj, X, c)
-            if nargin < 4, t = 0; end
-            if nargin < 3, y = 1; end
+            if nargin < 3, c = 1; end
             
             if size(X, 2) > 2, warning('Warning: x is more than 2 dimensions, this class only plots on a 2D axis'); end
             
@@ -53,7 +52,6 @@ classdef Plotter2d < StreamPlotter
                 obj.plotPoints(ind) = h;
             end
             
-            title(['Time ' num2str(t)]);
             hold off;
             
             obj.i = obj.i + 1;

@@ -1,3 +1,13 @@
+% Run an online experiment with models
+%
+% datastream: An extension of class StreamingData 
+% classifier: An extension of class ClassifierModel
+% plotter: An extension of class StreamPlotter
+% opts struct
+% .N: number of observations to classify
+% .Ntr: number of observations to initially classify
+% .debug: whether to output debug information
+% .statsEveryN: report statistics every N samples classified
 function [ results ] = run_online_experiment( datastream, classifier, plotter, opts )
 %RUN_ONLINE_EXPERIMENT Summary of this function goes here
 %   Detailed explanation goes here
@@ -26,6 +36,8 @@ end
 defaultOpts = struct;
 defaultOpts.N = 100000;
 defaultOpts.Ntr = 20000;
+defaultOpts.debug = 1;
+defaultOpts.statsEveryN = 100;
 % defaultOpts.nFolds = 10;
 % defaultOpts.nCores = 1;
 % defaultOpts.saveEvery = 1000;
@@ -70,6 +82,8 @@ for i = 1:length(results.t)
         results.dur(i) = toc(tStart);
     end
     
+    time(i);
+    
     % plot
     if ~isempty(plotter)
         if isempty(classifier)
@@ -81,6 +95,25 @@ for i = 1:length(results.t)
         getframe;
     end
 end
+
+
+    function debug(varargin)
+        if opts.debug == 1
+            varargin{:}
+        end
+    end
+
+    function time(i)
+        if mod(i, opts.statsEveryN) == 0
+            disp(['t: ' num2str(results.t(i))]);
+            disp(['i: ' num2str(i)]);
+            disp(['Last ' num2str(opts.statsEveryN) ' steps took ' ...
+                num2str(sum(results.t(i-opts.statsEveryN+1:i))) 's ' ...
+                '(' num2str(mean(results.t(i-opts.statsEveryN+1:i))) ' avg)']);
+            disp(['Current performance: ' ...
+                num2str(sum(results.h(1:i) == results.y(1:i)) / i)]);
+        end
+    end
 
 
 end

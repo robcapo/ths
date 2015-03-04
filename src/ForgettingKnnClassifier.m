@@ -16,13 +16,18 @@ classdef ForgettingKnnClassifier < ClassifierModel
     end
     
     methods
+        % Constructor
+        %
+        % opts struct
+        % .rowPadding: scalar # rows to grow matrix at once
+        % .beta: scalar forgetting rate 
+        % .k: number of neighbors to use
         function obj = ForgettingKnnClassifier(opts)
             if nargin < 1, opts = struct; end
             
             defaultOpts = struct;
             defaultOpts.rowPadding = 500;
             defaultOpts.beta = .1;
-            
             defaultOpts.k = 25;
             
             fields = fieldnames(defaultOpts);
@@ -35,6 +40,12 @@ classdef ForgettingKnnClassifier < ClassifierModel
             obj.opts = opts;
         end
         
+        
+        % Train classifier with n observations
+        %
+        % X: nxd matrix of observations
+        % y: nx1 or nxc binary matrix of class labels
+        % t: nx1 times sampled
         function train(obj, X, y, t)
             if isempty(obj.d), obj.d = size(X, 2); end
             
@@ -75,6 +86,11 @@ classdef ForgettingKnnClassifier < ClassifierModel
             obj.maxInd = obj.maxInd + size(X, 1);
         end
         
+        
+        % Classify m observations
+        %
+        % X: mxd matrix of observations
+        % t: mx1 vector of times sampled
         function h = classify(obj, X, t)
             if obj.maxInd == 0, error('ths:Classifier:ForgettingKnn:Untrained', 'I have not been trained yet!'); end
             
@@ -84,10 +100,11 @@ classdef ForgettingKnnClassifier < ClassifierModel
             end
             
             obj.train(X, H, t);
-            h = max(H, [], 2);
+            [~, h] = max(H, [], 2);
         end
         
-        function [X, y, Y, t] = getKnownData(obj)
+        % Gets current data (ignoring empty allocated rows)
+        function [X, y, Y, t] = getData(obj)
             X = obj.X(1:obj.maxInd, :);
             y = obj.y(1:obj.maxInd, :);
             Y = obj.Y(1:obj.maxInd, :);
@@ -97,32 +114,41 @@ classdef ForgettingKnnClassifier < ClassifierModel
     end
     
     methods (Hidden)
+        % Learn a signle observation
+        %
+        % h: 1xc posterior vector
+        %
+        % x: 1xd observation vector
+        % t: 1x1 time drawn
         function h = learn(obj, x, t)
-            [Dk, Yk, tk] = obj.findKnn(x);
+            [Dk, Yk, dtk] = obj.findKnn(x, t);
             
-            dtk = tk - t;
-            
-            h = sum(exp(-obj.opts.beta * dtk).*Yk);
-            h = h / sum(h);
-            
-            
+            h = sum(repmat(exp(-obj.opts.beta * abs(dtk)), 1, 2).*Yk);
+            h = h / sum(h); 
         end
         
-        function [Dk, Yk, tk] = findKnn(obj, x)
-            [X, ~, Y, ttr] = obj.getKnownData();
+        % Find k nearest neighbors
+        %
+        % dk: 1xk distance vector to neighbors
+        % Yk: cxk posterior matrix of neighbors
+        % tk: 1xk time vector
+        function [dk, Yk, dtk] = findKnn(obj, x, t)
+            [X, ~, Y, ttr] = obj.getData();
             
-            D = pdist2(X, x);
+            d = pdist2(X, x);
             
             k = min(obj.maxInd, obj.opts.k);
             
-            [~, Dind] = sort(D);
+            [~, dind] = sort(d);
             
-            Dk = D(Dind(1:k));
-            Yk = Y(Dind(1:k), :);
-            tk = ttr(Dind(1:k));
-            dtk = tk - t;
+            dk = d(dind(1:k));
+            Yk = Y(dind(1:k), :);
+            dtk = ttr(dind(1:k)) - t;
         end
-
+    
+        % Pad matrix in batches
+        %
+        % n: The number of slots that need to be filled now (will pad by opts.rowPadding)
         function growStorage(obj, n)
             if nargin < 1, n = 0; end
             
@@ -133,11 +159,12 @@ classdef ForgettingKnnClassifier < ClassifierModel
             end
         end
         
+        % Allocate rows in all the necessary spots
         function allocateRows(obj, rowsNeeded)
             obj.X = [obj.X; zeros(rowsNeeded, obj.d)];
             obj.t = [obj.t; zeros(rowsNeeded, 1)];
             obj.y = [obj.y; zeros(rowsNeeded, 1)];
-            obj.Y = [obj.Y; zeros(rowsNeeded, 1)];
+            obj.Y = [obj.Y; zeros(rowsNeeded, size(obj.Y, 2))];
         end
     end
     
