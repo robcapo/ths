@@ -121,7 +121,7 @@ classdef ForgettingKnnClassifier < ClassifierModel
         % x: 1xd observation vector
         % t: 1x1 time drawn
         function h = learn(obj, x, t)
-            [Dk, Yk, dtk] = obj.findKnn(x, t);
+            [~, Yk, dtk] = obj.findKnn(x, t);
             
             h = sum(repmat(exp(-obj.opts.beta * abs(dtk)), 1, 2).*Yk);
             h = h / sum(h); 
@@ -143,7 +143,7 @@ classdef ForgettingKnnClassifier < ClassifierModel
             
             dk = d(dind(1:k));
             Yk = Y(dind(1:k), :);
-            dtk = ttr(dind(1:k)) - t;
+            dtk = t - ttr(dind(1:k));
         end
     
         % Pad matrix in batches
