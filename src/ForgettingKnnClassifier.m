@@ -113,7 +113,7 @@ classdef ForgettingKnnClassifier < ClassifierModel
         
     end
     
-    methods (Hidden)
+    methods (Hidden, Access = protected)
         % Learn a signle observation
         %
         % h: 1xc posterior vector
