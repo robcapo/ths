@@ -121,29 +121,52 @@ classdef ForgettingKnnClassifier < ClassifierModel
         % x: 1xd observation vector
         % t: 1x1 time drawn
         function h = learn(obj, x, t)
-            [~, Yk, dtk] = obj.findKnn(x, t);
+            [dk, ~, Yk, ~] = obj.findKnnWithForgetting(x, t);
             
-            h = sum(repmat(exp(-obj.opts.beta * abs(dtk)), 1, 2).*Yk);
-            h = h / sum(h); 
+            h = sum(repmat(dk, 1, size(Yk, 2)) .* Yk, 1);
+            h = h / sum(h);
         end
         
         % Find k nearest neighbors
         %
         % dk: 1xk distance vector to neighbors
         % Yk: cxk posterior matrix of neighbors
-        % tk: 1xk time vector
-        function [dk, Yk, dtk] = findKnn(obj, x, t)
-            [X, ~, Y, ttr] = obj.getData();
+        % dtk: 1xk difference 
+        function [dk, Xk, Yk, tk] = findKnn(obj, x)
+            [Xtr, ~, Ytr, ttr] = obj.getData();
             
-            d = pdist2(X, x);
+            d = pdist2(Xtr, x);
             
             k = min(obj.maxInd, obj.opts.k);
             
             [~, dind] = sort(d);
             
             dk = d(dind(1:k));
-            Yk = Y(dind(1:k), :);
-            dtk = t - ttr(dind(1:k));
+            Xk = Xtr(dind(1:k), :);
+            Yk = Ytr(dind(1:k), :);
+            tk = ttr(dind(1:k));
+        end
+        
+        % Find k nearest neighbors
+        %
+        % dk: 1xk distance vector to neighbors
+        % Yk: cxk posterior matrix of neighbors
+        % dtk: 1xk difference 
+        function [dk, Xk, Yk, tk] = findKnnWithForgetting(obj, x, t)
+            [Xtr, ~, Ytr, ttr] = obj.getData();
+            
+            dt = obj.opts.beta*abs(t - ttr);
+            
+            d = pdist2([Xtr, dt], [x, zeros(size(x, 1), 1)]);
+            
+            k = min(obj.maxInd, obj.opts.k);
+            
+            [~, dind] = sort(d);
+            
+            dk = d(dind(1:k));
+            Xk = Xtr(dind(1:k), :);
+            Yk = Ytr(dind(1:k), :);
+            tk = ttr(dind(1:k));
         end
     
         % Pad matrix in batches

@@ -97,6 +97,11 @@ for i = 1:length(results.t)
         else
             y = results.h(i);
         end
+        
+        if results.h(i) ~= results.y(i)
+            warning('Misclassified!');
+        end
+        
         plotter.plot(results.X(i, :), y);
         getframe;
     end
