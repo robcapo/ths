@@ -16,15 +16,15 @@ if nargin < 3, plotter = []; end
 if nargin < 2, classifier = []; end
 
 if ~isa(datastream, 'StreamingData')
-    error('ths:DataStream:Invalid', 'The first argument to the constructor must be a StreamingData object');
+    error('ths:DataStream:Invalid', 'The first argument to this function must be a StreamingData object');
 end
 
 if ~isa(classifier, 'ClassifierModel') && ~isempty(classifier)
-    error('ths:Classifier:Invalid', 'The second argument to my constructor must be a ClassifierModel object');
+    error('ths:Classifier:Invalid', 'The second argument to this function must be a ClassifierModel object');
 end
 
 if ~isa(plotter, 'StreamPlotter') && ~isempty(plotter)
-    error('ths:Plotter:Invalid', 'The third argument to my constructor must be a StreamPlotter object');
+    error('ths:Plotter:Invalid', 'The third argument to this function must be a StreamPlotter object');
 end
 
 if isempty(datastream.tMax)
