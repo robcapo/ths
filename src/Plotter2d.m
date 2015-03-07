@@ -23,11 +23,11 @@ classdef Plotter2d < StreamPlotter
                 obj.axh = gca;
             end
             
-            if isfield(opts, 'n'), obj.n = opts.n; end
+            if isfield(opts, 'N'), obj.N = opts.N; end
             if isfield(opts, 'colors'), obj.colors = opts.colors; end
             
-            if obj.n > 0
-                obj.plotPoints = zeros(obj.n, 1);
+            if obj.N > 0
+                obj.plotPoints = zeros(obj.N, 1);
             end
         end
         
@@ -43,8 +43,8 @@ classdef Plotter2d < StreamPlotter
             
             h = scatter(X(:, 1), X(:, 2), 25, colors, 'filled');
             
-            if ~isempty(obj.n)
-                ind = mod(obj.i - 1, obj.n) + 1;
+            if ~isempty(obj.N)
+                ind = mod(obj.i - 1, obj.N) + 1;
                 if obj.plotPoints(ind) ~= 0
                     delete(obj.plotPoints(ind));
                 end

@@ -4,7 +4,7 @@ classdef StreamPlotter < handle
     
     properties (SetAccess = protected)
         axh;
-        n = 250; % number of most recent points to retain on plot
+        N = 250; % number of most recent points to retain on plot
         colors  = [ 1 0 0;      % Red
                     0 1 0;      % Green
                     0 0 1;      % Blue
