@@ -29,7 +29,7 @@ classdef TrailingGaussians < StreamingData
             end
             
             obj.tMax = opts.tMax;
-            obj.y = 1:opts.C;
+            obj.y = (1:opts.C)';
             obj.d = opts.d;
             
             obj.mu0 = repmat((0:opts.spread:opts.spread*(opts.C - 1))', 1, opts.d);
