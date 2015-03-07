@@ -86,9 +86,13 @@ for i = 1:length(results.t)
         tStart = tic;
         results.h(i) = classifier.classify(results.X(i, :), results.t(i));
         results.dur(i) = toc(tStart);
+        
+        if results.h(i) ~= results.y(i)
+            warning('Misclassified!');
+        end
+        
+        time(i);
     end
-    
-    time(i);
     
     % plot
     if ~isempty(plotter)
@@ -98,11 +102,8 @@ for i = 1:length(results.t)
             y = results.h(i);
         end
         
-        if results.h(i) ~= results.y(i)
-            warning('Misclassified!');
-        end
-        
         plotter.plot(results.X(i, :), y);
+        title(plotter.axh, ['Time: ' num2str(results.t(i))]);
         getframe;
     end
 end
