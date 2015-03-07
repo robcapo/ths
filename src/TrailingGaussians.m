@@ -18,7 +18,6 @@ classdef TrailingGaussians < StreamingData
             defaultOpts.spread = 5;
             defaultOpts.sig = 1;
             defaultOpts.d = 2;
-            defaultOpts.tMax = 10;
             defaultOpts.dmu = 1;
             
             fields = fieldnames(defaultOpts);
@@ -28,7 +27,6 @@ classdef TrailingGaussians < StreamingData
                 end
             end
             
-            obj.tMax = opts.tMax;
             obj.y = (1:opts.C)';
             obj.d = opts.d;
             
@@ -41,6 +39,12 @@ classdef TrailingGaussians < StreamingData
             else
                 error('ths:StreamingData:BadOptions', 'opts.dmu must be a 1xopts.d vector');
             end
+            
+            if isempty(opts.tMax)
+                opts.tMax = 1.1*max((obj.mu0(end, :) - obj.mu0(1, :)) ./ obj.dmu);
+            end
+            
+            obj.tMax = opts.tMax;
             
             if length(opts.sig) == 1
                 obj.sig = diag(opts.sig * ones(obj.d, 1));
