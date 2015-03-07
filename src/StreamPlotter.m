@@ -19,6 +19,9 @@ classdef StreamPlotter < handle
         % X - vector or matrix of points to plot
         % c - scalar or vector of color indices to plot each point in X in
         plot(obj, X, c)
+        
+        % Clears the plot
+        clear(obj)
     end
     
 end

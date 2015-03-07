@@ -56,6 +56,12 @@ classdef Plotter2d < StreamPlotter
             
             obj.i = obj.i + 1;
         end
+        
+        function clear(obj)
+            cla(obj.axh);
+            obj.i = 1;
+            obj.plotPoints = zeros(size(obj.plotPoints));
+        end
     end
     
 end
