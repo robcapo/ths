@@ -61,9 +61,9 @@ disp(plotter);
 
 results = struct;
 
-t = linspace(0, datastream.tMax, opts.N + opts.Ntr);
+t = linspace(0, datastream.tMax, opts.N + opts.Ntr)';
 
-results.t_tr = t(1:opts.Ntr)';
+results.t_tr = t(1:opts.Ntr);
 
 [results.X_tr, results.y_tr] = datastream.sample(results.t_tr);
 
@@ -73,7 +73,7 @@ if ~isempty(classifier)
     disp(['Training took: ' num2str(toc(z)) 's']);
 end
 
-results.t = t(opts.Ntr + 1:end)';
+results.t = t(opts.Ntr + 1:end);
 results.X = zeros(length(results.t), size(results.X_tr, 2));
 results.h = zeros(size(results.t));
 results.dur = zeros(size(results.t));
@@ -86,10 +86,6 @@ for i = 1:length(results.t)
         tStart = tic;
         results.h(i) = classifier.classify(results.X(i, :), results.t(i));
         results.dur(i) = toc(tStart);
-        
-        if results.h(i) ~= results.y(i)
-            warning('Misclassified!');
-        end
         
         time(i);
     end
