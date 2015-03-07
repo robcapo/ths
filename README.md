@@ -21,6 +21,20 @@ from class `y`. `y` should be optional and drawn from a uniform
 distribution containing all possible classes by default. `t` is
 required.
 
+__Implementations__:
+
+__ForgettingKnnClassifier__
+
+`obj = ForgettingKnnClassifier(opts)`
+
+`opts` is a `struct` with the following fields:
+
+Field        | Description 
+-------------|------------------------------------------------------------------------------------
+`rowPadding` | The number of rows to grow the resizable array `X` when it gets full (_default_: `500`) 
+`k`          | The number of nearest neighbors to consider (_default_: `25`) 
+`beta`       | The forgetting rate over time (_default_: `.1`) 
+
 ### StreamPlotter
 This object is used to plot datasets that come from a stream. Objects
 that implement this interface should hide older observations as the
@@ -51,15 +65,3 @@ drawn at time `t`. The number of rows in `X` and `t` must be the same. `h`
 is a vector containing the same number of rows as `X` and `t`, with integers
 specifying the class label that the observations belong to, according to the
 classifier.
-
-## Implementations
-
-### ForgettingKnnClassifier
-__Constructor__: `obj = ForgettingKnnClassifier(opts)`
-`opts` is a `struct` with the following fields:
-
-Field        | Description 
--------------|------------------------------------------------------------------------------------
-`rowPadding` | The number of rows to grow the resizable array `X` when it gets full (_default_: `500`) 
-`k`          | The number of nearest neighbors to consider (_default_: `25`) 
-`beta`       | The forgetting rate over time (_default_: `.1`) 
