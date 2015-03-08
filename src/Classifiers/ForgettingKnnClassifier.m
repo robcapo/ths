@@ -121,7 +121,7 @@ classdef ForgettingKnnClassifier < ClassifierModel
         % x: 1xd observation vector
         % t: 1x1 time drawn
         function h = learn(obj, x, t)
-            [dk, ~, Yk, ~] = obj.findKnnWithForgetting(x, t);
+            [dk, ~, Yk, tk] = obj.findKnnWithForgetting(x, t);
             
             h = sum(repmat(dk, 1, size(Yk, 2)) .* Yk, 1);
             h = h / sum(h);
@@ -157,12 +157,12 @@ classdef ForgettingKnnClassifier < ClassifierModel
             
             dt = obj.opts.beta*abs(t - ttr);
             
+            % Find order of nearest neighbors
             d = pdist2([Xtr, dt], [x, zeros(size(x, 1), 1)]);
-            
-            k = min(obj.maxInd, obj.opts.k);
-            
             [~, dind] = sort(d);
             
+            % Return k closest
+            k = min(obj.maxInd, obj.opts.k);
             dk = d(dind(1:k));
             Xk = Xtr(dind(1:k), :);
             Yk = Ytr(dind(1:k), :);
