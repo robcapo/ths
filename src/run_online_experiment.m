@@ -64,7 +64,6 @@ results = struct;
 t = linspace(0, datastream.tMax, opts.N + opts.Ntr)';
 
 results.t_tr = t(1:opts.Ntr);
-
 [results.X_tr, results.y_tr] = datastream.sample(results.t_tr);
 
 if ~isempty(classifier)
@@ -74,11 +73,12 @@ if ~isempty(classifier)
 end
 
 results.t = t(opts.Ntr + 1:end);
-results.X = zeros(length(results.t), size(results.X_tr, 2));
+[results.X, results.y] = datastream.sample(results.t);
+
 results.h = zeros(size(results.t));
 results.dur = zeros(size(results.t));
 
-[results.X, results.y] = datastream.sample(results.t);
+
 
 for i = 1:length(results.t)
     % classify
@@ -104,18 +104,21 @@ for i = 1:length(results.t)
     end
 end
 
-    function time(i)
-        if mod(i, opts.statsEveryN) == 0
-            disp('--');
-            disp(['t: ' num2str(results.t(i))]);
-            disp(['N: ' num2str(i)]);
-            disp(['Last ' num2str(opts.statsEveryN) ' steps took ' ...
-                num2str(sum(results.dur(i-opts.statsEveryN+1:i))) 's ' ...
-                '(' num2str(mean(results.dur(i-opts.statsEveryN+1:i))) ' avg)']);
-            disp(['Current performance: ' ...
-                num2str(sum(results.h(1:i) == results.y(1:i)) * 100/ i) '%']);
-        end
+
+
+
+function time(i)
+    if mod(i, opts.statsEveryN) == 0
+        disp('--');
+        disp(['t: ' num2str(results.t(i))]);
+        disp(['N: ' num2str(i)]);
+        disp(['Last ' num2str(opts.statsEveryN) ' steps took ' ...
+            num2str(sum(results.dur(i-opts.statsEveryN+1:i))) 's ' ...
+            '(' num2str(mean(results.dur(i-opts.statsEveryN+1:i))) ' avg)']);
+        disp(['Current performance: ' ...
+            num2str(sum(results.h(1:i) == results.y(1:i)) * 100/ i) '%']);
     end
+end
 
 
 end
