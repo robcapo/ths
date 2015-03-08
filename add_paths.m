@@ -1,4 +1,4 @@
-function add_path()
+function add_paths()
     thePath = genpath(pwd);
     dirs = strsplit(thePath, ':');
     i = 1;
