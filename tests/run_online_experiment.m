@@ -49,6 +49,10 @@ for i = 1:length(fields)
     end
 end
 
+if ~isempty(classifier)
+    opts.ClassifierOpts = classifier.opts;
+end
+
 disp(['Experiment started at: ' datestr(now, 'HH:MM AM on mmm dd, yyyy')]);
 disp('Options:');
 disp(opts);
@@ -60,6 +64,7 @@ disp('Plotter:');
 disp(plotter);
 
 results = struct;
+results.opts = opts;
 
 t = linspace(0, datastream.tMax, opts.N + opts.Ntr)';
 
