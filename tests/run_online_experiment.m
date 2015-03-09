@@ -7,7 +7,7 @@
 % .N: number of observations to classify
 % .Ntr: number of observations to initially classify
 % .statsEveryN: report statistics every N samples classified
-function [ results, opts ] = run_online_experiment( datastream, classifier, plotter, opts )
+function [ results ] = run_online_experiment( datastream, classifier, plotter, opts )
 %RUN_ONLINE_EXPERIMENT Summary of this function goes here
 %   Detailed explanation goes here
 
