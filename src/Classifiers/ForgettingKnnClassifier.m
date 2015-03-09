@@ -10,8 +10,6 @@ classdef ForgettingKnnClassifier < ClassifierModel
         Y = []; % posteriors
         t = []; % sample times
         
-        opts; % user 
-        
         d; % dimensions of data
     end
     
