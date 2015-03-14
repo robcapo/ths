@@ -2,7 +2,7 @@ function results = fKNN_NOAA_param_sweep(betas, cores)
     if nargin < 2, cores = feature('numCores'); end
     if nargin < 1, betas = linspace(0, 20, 100); end
     
-    load('datasets/NOAA_Rain');
+    load('datasets/noaa_rain');
     tr = 500;
     
     inputs = cell(length(betas), 4);
