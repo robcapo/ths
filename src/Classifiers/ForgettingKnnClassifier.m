@@ -121,7 +121,7 @@ classdef ForgettingKnnClassifier < ClassifierModel
         function h = learn(obj, x, t)
             [dk, ~, Yk, tk] = obj.findKnnWithForgetting(x, t);
             
-            h = sum(repmat(dk, 1, size(Yk, 2)) .* Yk, 1);
+            h = sum(repmat(exp(-dk), 1, size(Yk, 2)) .* Yk, 1);
             h = h / sum(h);
         end
         
