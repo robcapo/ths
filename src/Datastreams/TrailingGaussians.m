@@ -20,6 +20,7 @@ classdef TrailingGaussians < StreamingData
             defaultOpts.d = 2;
             defaultOpts.dmu = 1;
             defaultOpts.tMax = [];
+            defaultOpts.priors = 1;
             
             fields = fieldnames(defaultOpts);
             for i = 1:length(fields)
@@ -30,6 +31,7 @@ classdef TrailingGaussians < StreamingData
             
             obj.y = (1:opts.C)';
             obj.d = opts.d;
+            obj.priors = opts.priors;
             
             obj.mu0 = repmat((0:opts.spread:opts.spread*(opts.C - 1))', 1, opts.d);
             
@@ -58,15 +60,14 @@ classdef TrailingGaussians < StreamingData
         
         function [x, y] = sample(obj, t, y)
             if nargin < 3
-                inds = round((length(obj.y) - 1)*rand(size(t))+1);
-                y = obj.y(inds);
+                y = obj.chooseclass(t);
             end
             
-            mus = obj.mu0(inds, :);
+            mus = obj.mu0(y, :);
             
-            x = zeros(length(inds), obj.d);
+            x = zeros(length(y), obj.d);
             
-            for i = 1:length(inds)
+            for i = 1:length(y)
                 x(i, :) = mvnrnd(mus(i, :) + t(i)*obj.dmu, obj.sig, 1);
             end
         end

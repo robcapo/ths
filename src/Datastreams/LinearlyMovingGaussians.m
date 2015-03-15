@@ -17,6 +17,7 @@ classdef LinearlyMovingGaussians < StreamingData
             defaultOpts.muT = [4.5, 0; 0, 4.5];
             defaultOpts.sig = {[1, 0; 0, 1]; [1, 0; 0, 1]};
             defaultOpts.tMax = 5;
+            defaultOpts.priors = 1;
             
             
             fields = fieldnames(defaultOpts);
@@ -30,6 +31,7 @@ classdef LinearlyMovingGaussians < StreamingData
             obj.mu0 = opts.mu0;
             obj.muT = opts.muT;
             obj.sig = opts.sig;
+            obj.priors = opts.priors;
             
             obj.d = size(obj.mu0, 2);
             obj.y = (1:size(obj.mu0, 1))';
@@ -38,8 +40,7 @@ classdef LinearlyMovingGaussians < StreamingData
         
         function [x, y] = sample(obj, t, y)
             if nargin < 3
-                inds = round((length(obj.y) - 1)*rand(size(t))+1);
-                y = obj.y(inds);
+                y = obj.chooseclass(t);
             end
             
             if t > obj.tMax
