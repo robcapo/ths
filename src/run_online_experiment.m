@@ -36,8 +36,6 @@ defaultOpts = struct;
 defaultOpts.N = 1000;
 defaultOpts.Ntr = 100;
 defaultOpts.statsEveryN = 100;
-% defaultOpts.nFolds = 10;
-% defaultOpts.nCores = 1;
 % defaultOpts.saveEvery = 1000;
 % defaultOpts.resultsDirectory = ['results' datestr(now, 'yyyy-mm-dd/HHMM/')];
 
