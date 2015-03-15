@@ -103,7 +103,7 @@ for i = 1:length(results.t)
         
         plotter.plot(results.X(i, :), y);
         title(plotter.axh, ['Time: ' num2str(results.t(i))]);
-        getframe;
+        drawnow;
     end
 end
 
