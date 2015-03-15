@@ -20,17 +20,17 @@ function results = fKNN_RG_param_sweep(betas, cores)
         inputs{i, 4} = opts;
     end
     
-    matlabpool('open', cores);
+    pool = parpool(cores);
 
     try
         parfor i = 1:length(betas)
             results{i} = run_online_experiment(inputs{i, :});
         end
     catch e
-        matlabpool('close');
+        delete(pool);
         rethrow(e);
     end
     
-    matlabpool('close');
+    delete(pool);
     
 end

@@ -18,7 +18,7 @@ function results = fKNN_NOAA_param_sweep(betas, cores)
         inputs{i, 5} = tr;
     end
     
-    matlabpool('open', cores);
+    pool = parpool(cores);
 
     try
         results = cell(length(betas), 1);
@@ -27,9 +27,9 @@ function results = fKNN_NOAA_param_sweep(betas, cores)
             results{i} = run_online_dataset(inputs{i, :});
         end
     catch e
-        matlabpool('close');
+        delete(pool);
         rethrow(e);
     end
     
-    matlabpool('close');
+    delete(pool);
 end
