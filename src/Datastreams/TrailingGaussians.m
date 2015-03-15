@@ -19,6 +19,7 @@ classdef TrailingGaussians < StreamingData
             defaultOpts.sig = 1;
             defaultOpts.d = 2;
             defaultOpts.dmu = 1;
+            defaultOpts.tMax = [];
             
             fields = fieldnames(defaultOpts);
             for i = 1:length(fields)
