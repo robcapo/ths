@@ -1,6 +1,12 @@
 classdef LinearlyMovingGaussians < StreamingData
-    %LINEARLYMOVINGGAUSSIANS Summary of this class goes here
-    %   Detailed explanation goes here
+    %LINEARLYMOVINGGAUSSIANS This class creates multiple Gaussians and moves their means linearly from mu0 to muT
+    %   There can be an arbitrary number of Gaussians in an arbitrary number of dimensions
+    %   Options:
+    %   mu0- Cxd vector of initial means of the Gaussians
+    %   muT- Cxd vector of the final means of the Gaussians
+    %   sig- Length C cell vector of dxd covariance matrices
+    %   tMax- scalar amount of time for mu0 -> muT
+    %   priors- C length vector of prior probabilities for each class
     
     properties
         mu0;
