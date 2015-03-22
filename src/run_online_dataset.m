@@ -39,9 +39,12 @@ if isscalar(tr)
     tr = padarray(ones(tr, 1), size(X, 1) - tr, 0, 'post');
 end
 
+opts = struct;
+opts.ClassifierOpts = classifier.opts;
 
 results = struct;
 
+results.opts = opts;
 results.t_tr = t(tr == 1, :);
 results.X_tr = X(tr == 1, :);
 results.y_tr = y(tr == 1, :);

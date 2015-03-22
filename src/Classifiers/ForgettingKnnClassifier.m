@@ -10,6 +10,8 @@ classdef ForgettingKnnClassifier < ClassifierModel
         Y = []; % posteriors
         t = []; % sample times
         
+        priors = [];
+        
         d; % dimensions of data
     end
     
@@ -70,6 +72,7 @@ classdef ForgettingKnnClassifier < ClassifierModel
             % Ensure that posterior matrix matches the current set of known classes
             if size(Y, 2) > size(obj.Y, 2)
                 obj.Y = [obj.Y, zeros(size(obj.Y, 1), size(Y, 2) -  size(obj.Y, 2))];
+                obj.priors = [obj.priors, zeros(1, size(Y, 2) - size(obj.priors, 2))];
             elseif size(Y, 2) < size(obj.Y, 2)
                 Y = [Y, zeros(size(Y, 1), size(obj.Y, 2) - size(Y, 2))];
             end
@@ -80,6 +83,7 @@ classdef ForgettingKnnClassifier < ClassifierModel
             obj.y(ind:ind+n-1, :) = y;
             obj.Y(ind:ind+n-1, :) = Y;
             obj.t(ind:ind+n-1, :) = t;
+            obj.priors = obj.priors + sum(Y, 1);
             
             obj.maxInd = obj.maxInd + size(X, 1);
         end
@@ -121,7 +125,7 @@ classdef ForgettingKnnClassifier < ClassifierModel
         function h = learn(obj, x, t)
             [dk, ~, Yk, tk] = obj.findKnnWithForgetting(x, t);
             
-            h = sum(repmat(dk, 1, size(Yk, 2)) .* Yk, 1);
+            h = sum(repmat(exp(-dk), 1, size(Yk, 2)) .* Yk, 1);
             h = h / sum(h);
         end
         
@@ -151,9 +155,11 @@ classdef ForgettingKnnClassifier < ClassifierModel
         % Yk: cxk posterior matrix of neighbors
         % dtk: 1xk difference 
         function [dk, Xk, Yk, tk] = findKnnWithForgetting(obj, x, t)
-            [Xtr, ~, Ytr, ttr] = obj.getData();
+            [Xtr, y, Ytr, ttr] = obj.getData();
             
-            dt = obj.opts.beta*abs(t - ttr);
+            classPriors = obj.priors / sum(obj.priors, 2);
+            
+            dt = obj.opts.beta*classPriors(y)'.*abs(t - ttr);
             
             % Find order of nearest neighbors
             d = pdist2([Xtr, dt], [x, zeros(size(x, 1), 1)]);
