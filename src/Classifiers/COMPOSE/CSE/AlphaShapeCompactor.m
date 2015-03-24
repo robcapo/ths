@@ -40,7 +40,11 @@ classdef AlphaShapeCompactor < CoreSupportExtractor
                 edges = zeros(size(simplexes, 1) * size(simplexes, 2), size(simplexes, 2) - 1);
                 cols = 1:size(simplexes,2);
                 for i = 1:size(ashape.simplexes,2)
-                    edges((i-1)*size(simplexes, 1) + 1:i*size(simplexes, 1), :) = simplexes(:, cols(1:size(simplexes,2)-1));
+                    % Append all but one column from the d simplexes matrix to the d-1 simplexes matrix
+                    edges((i-1)*size(simplexes, 1) + 1:i*size(simplexes, 1), :) = ...
+                        simplexes(:, cols(1:size(simplexes,2)-1));
+                    
+                    % Change the column that is being removed
                     cols = circshift(cols,[0 1]);    
                 end
 
