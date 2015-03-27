@@ -1,7 +1,7 @@
 % n:        number of points
 % R:        Distance from origin to center of torus tube
 % r:        Radius of tube
-function [x y z] = gen_torus(n, R, r)
+function [x, y, z] = gen_torus(n, R, r)
     if nargin < 3, r = .25; end
     if nargin < 2, R = 1; end
     if nargin < 1, n = 1000; end

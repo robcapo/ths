@@ -2,7 +2,7 @@
 % thetas:   Number of legs (scalar) or theta values for each leg (vector)
 % rhos:     Radius of each leg (vector or scalar)
 % spreads:  Amount of spread for each leg (vector or scalar)
-function [x y z] = gen_legs3d(ns, thetas, rhos, spreads)
+function [x, y, z] = gen_legs3d(ns, thetas, rhos, spreads)
     if nargin < 4; spreads = .2; end
     if nargin < 3, rhos = 1; end
     if nargin < 2, thetas = 3; end
@@ -54,7 +54,7 @@ function [x y z] = gen_legs3d(ns, thetas, rhos, spreads)
         theta = thetas(i);
         
         % Create a horizontal leg
-        [xi yi zi] = sph2cart(0, 0, rhos_i);
+        [xi, yi, zi] = sph2cart(0, 0, rhos_i);
         
         % Add y and z white noise
         yi = yi + randn(ns(i), 1) * spreads(i) / 2;
