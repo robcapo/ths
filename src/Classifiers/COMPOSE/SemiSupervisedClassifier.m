@@ -1,5 +1,5 @@
 classdef SemiSupervisedClassifier < handle
     methods (Abstract = true)
-        h = classify(obj, X, y, data);
+        h = classify(obj, Xl, yl, Xu);
     end
 end
