@@ -5,7 +5,7 @@ pool = parpool(feature('numCores'));
 mu = [0 0];
 sigma = eye(2);
 
-Ns = 1000:1000:2000;
+Ns = 1000:1000:100000;
 
 results = cell(length(Ns), 1);
 
