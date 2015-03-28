@@ -10,7 +10,7 @@ classdef ParzenWindowSampler < CoreSupportExtractor
         function obj = ParzenWindowSampler(opts)
             if nargin < 1, opts = struct; end
             
-            if isfield(opts.sigma), obj.sigma = opts.sigma; end
+            if isfield(opts, 'sigma'), obj.sigma = opts.sigma; end
         end
         
         function inds = extract(obj, data)
@@ -29,8 +29,8 @@ classdef ParzenWindowSampler < CoreSupportExtractor
             for i = 1:length(data)
                 mu = data(i, :);
                 
-                minBox = repmat(mu - sigma, size(data, 1), 1);
-                maxBox = repmat(mu + sigma, size(data, 1), 1);
+                minBox = repmat(mu - sigma / 2, size(data, 1), 1);
+                maxBox = repmat(mu + sigma / 2, size(data, 1), 1);
                 
                 X = data( ...
                     all([data > minBox, data < maxBox], 2), ...
