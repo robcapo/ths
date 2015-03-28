@@ -7,6 +7,12 @@ classdef ParzenWindowSampler < CoreSupportExtractor
     end
     
     methods
+        function obj = ParzenWindowSampler(opts)
+            if nargin < 1, opts = struct; end
+            
+            if isfield(opts.sigma), obj.sigma = opts.sigma; end
+        end
+        
         function inds = extract(obj, data)
             if size(obj.sigma, 2) == 1
                 sigma = obj.sigma * ones(1, size(data, 2));
