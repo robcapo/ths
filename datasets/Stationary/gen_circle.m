@@ -5,7 +5,7 @@ function [x, y] = gen_circle(n, r, mode)
     
     if strcmp(mode, 'normal')
         thetas = rand(n, 1) * pi;
-        rhos = randn(n, 1) * r / 2;
+        rhos = randn(n, 1) * r;
     else
         thetas = rand(n, 1) * 2 * pi;
         rhos = rand(n, 1) * r;

@@ -34,9 +34,7 @@ function [x, y] = gen_legs(ns, thetas, rhos, spreads)
     n_points = sum(ns);
     
     % Validate size of each vector
-    if length(thetas) == length(rhos) && length(rhos) == length(spreads) && length(ns) == length(rhos)
-        
-    else
+    if ~(length(thetas) == length(rhos) && length(rhos) == length(spreads) && length(ns) == length(rhos))
         error('All input vectors must be scalar or the same length');
     end
     
