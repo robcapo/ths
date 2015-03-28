@@ -14,4 +14,6 @@ function [x, y] = gen_spiral(n, k, r, spread, theta0)
     rs = rs + r_spreads;
     
     [x, y] = pol2cart(thetas, rs);
+    x = x';
+    y = y';
 end
