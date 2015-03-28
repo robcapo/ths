@@ -15,11 +15,12 @@ classdef AlphaShapeCompactor < CoreSupportExtractor
         end
         
         function inds = extract(obj, data)
+            inds = [];
+            
             ashape = obj.createAlphaShape(data);
 
             if isempty(ashape)
                 display('No Alpha Shape could be constructed try different alpha or check data');
-                inds = [];
                 return;
             end
             
@@ -61,8 +62,13 @@ classdef AlphaShapeCompactor < CoreSupportExtractor
                 ashape.include(edgeID(diff_edges ~= 0)) = 0;
                 points_remaining = unique(ashape.simplexes(ashape.include==1));
                 
-                if numel(points_remaining) < N_core_supports 
-                   break;
+                if numel(points_remaining) < N_core_supports
+                    if isempty(inds)
+                        warning('No samples selected. Increasing \alpha');
+                        obj.alpha = obj.alpha * 1.1;
+                        inds = obj.extract(data);
+                    end
+                    break;
                 end
                 
                 inds = points_remaining;
