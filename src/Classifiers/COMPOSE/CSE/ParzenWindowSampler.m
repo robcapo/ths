@@ -4,6 +4,7 @@ classdef ParzenWindowSampler < CoreSupportExtractor
     
     properties
         sigma = 3; % size of box
+        nMin = 2;  % min observations in window for density to be larger than 0
     end
     
     methods
@@ -11,6 +12,7 @@ classdef ParzenWindowSampler < CoreSupportExtractor
             if nargin < 1, opts = struct; end
             
             if isfield(opts, 'sigma'), obj.sigma = opts.sigma; end
+            if isfield(opts, 'nMin'), obj.nMin = opts.nMin; end
         end
         
         function inds = extract(obj, data)
@@ -36,8 +38,10 @@ classdef ParzenWindowSampler < CoreSupportExtractor
                     all([data > minBox, data < maxBox], 2), ...
                     : ...
                 );
+            
+                X(ismember(X, mu, 'rows'), :) = [];
                 
-                if isempty(X)
+                if size(X, 1) < obj.nMin
                     d(i) = 0;
                     continue;
                 end
