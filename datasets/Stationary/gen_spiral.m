@@ -1,6 +1,6 @@
 function [x, y] = gen_spiral(n, k, r, spread, theta0)
     if nargin < 5, theta0 = 0; end
-    if nargin < 4, spread = 0; end
+    if nargin < 4, spread = .1; end
     if nargin < 3, r = 1; end
     if nargin < 2, k = 2; end
     if nargin < 1, n = 500; end
@@ -14,7 +14,4 @@ function [x, y] = gen_spiral(n, k, r, spread, theta0)
     rs = rs + r_spreads;
     
     [x, y] = pol2cart(thetas, rs);
-    
-    x = x' + mvnrnd(0, .004, length(x));
-    y = y' + mvnrnd(0, .004, length(y));
 end
