@@ -2,21 +2,25 @@ function [ results ] = compare_cse_complexity( data )
 %COMPARE_CSE_COMPLEXITY Summary of this function goes here
 %   Detailed explanation goes here
 
-cses(1) = struct('obj', AlphaShapeCompactor, 'name', '\alpha-shape');
-cses(2) = struct('obj', GMMDensitySampler, 'name', 'GMM');
-cses(3) = struct('obj', KNNDensitySampler, 'name', 'kNN');
-cses(4) = struct('obj', ParzenWindowSampler, 'name', 'Parzen Window');
+cses.alpha = struct('obj', AlphaShapeCompactor, 'name', '\alpha-shape', 'duration', 0);
+cses.gmm = struct('obj', GMMDensitySampler, 'name', 'GMM', 'duration', 0);
+cses.knn = struct('obj', KNNDensitySampler, 'name', 'kNN', 'duration', 0);
+cses.parzen = struct('obj', ParzenWindowSampler, 'name', 'Parzen Window', 'duration', 0);
 
-for i = 1:length(cses)
+results = struct('N', size(data, 1), 'd', size(data, 2));
+
+fields = fieldnames(cses);
+
+for i = 1:length(fields)
     tic;
-    cses(i).obj.extract(data);
+    cses.(fields{i}).obj.extract(data);
     dur = toc;
-    results(i) = struct( ...
-        'name', cses(i).name, ...
-        'duration', dur, ...
-        'N', size(data, 1), ...
-        'd', size(data, 2) ...
-    );
+    disp(['Extraction of ' ...
+        num2str(size(data, 1)) ' samples in ' ...
+        num2str(size(data, 2)) ' dimensions with ' ...
+        cses.(fields{i}).name ' took ' num2str(dur) ' seconds']);
+    
+    results.cses.(fields{i}).duration = dur;
 end
 
 end
