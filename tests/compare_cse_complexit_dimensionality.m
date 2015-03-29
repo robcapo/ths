@@ -2,19 +2,19 @@ clear all; close all;
 
 mu = [0 0];
 sigma = eye(2);
+N = 5000;
+ds = 1:20;
 
-Ns = 1000:1000:100000;
-
-results = cell(length(Ns), 1);
+results = cell(length(ds), 1);
 
 warning('off', 'stats:gmdistribution:FailedToConverge');
 
 pool = parpool(feature('numCores'));
 try
-    parfor i = 1:length(Ns)
-        disp(['Testing with ' num2str(Ns(i)) ' samples']);
+    parfor i = 1:length(ds)
+        disp(['Testing with ' num2str(ds(i)) ' dimensions']);
 
-        results{i} = compare_cse_complexity(mvnrnd(mu, sigma, Ns(i)));
+        results{i} = compare_cse_complexity(mvnrnd(zeros(1, ds(i)), eye(ds(i)), N));
     end
     
     save('results', 'results');
