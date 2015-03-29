@@ -14,7 +14,9 @@ try
     parfor i = 1:length(ds)
         disp(['Testing with ' num2str(ds(i)) ' dimensions']);
 
+        tic;
         results{i} = compare_cse_complexity(mvnrnd(zeros(1, ds(i)), eye(ds(i)), N));
+        disp(['Testing in ' num2str(ds(i)) ' dimensions took ' num2str(toc) ' seconds']);
     end
     
     save('results', 'results');
