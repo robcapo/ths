@@ -12,9 +12,16 @@ results = struct('N', size(data, 1), 'd', size(data, 2));
 fields = fieldnames(cses);
 
 for i = 1:length(fields)
-    tic;
-    cses.(fields{i}).obj.extract(data);
-    dur = toc;
+    % Do not let alpha shapes run on dimensionality higher than 5. They
+    % take too long
+    if ~(size(data, 2) > 5 && strcmp(fields(i), 'alpha'))
+        tic;
+        cses.(fields{i}).obj.extract(data);
+        dur = toc;
+    else
+        dur = 0;
+    end
+    
     disp(['Extraction of ' ...
         num2str(size(data, 1)) ' samples in ' ...
         num2str(size(data, 2)) ' dimensions with ' ...
