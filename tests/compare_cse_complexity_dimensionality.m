@@ -3,7 +3,7 @@ clear all; close all;
 mu = [0 0];
 sigma = eye(2);
 N = 5000;
-ds = 2:20;
+ds = 2:5;
 
 results = cell(length(ds), 1);
 
