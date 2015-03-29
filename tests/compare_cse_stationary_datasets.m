@@ -24,6 +24,7 @@ for i = 1:size(datasets, 1)
         tic;
         inds = cse.extract([x, y]);
         dur = toc;
+        disp(['Extraction took: ' num2str(dur) ' seconds.']);
         
         subplot(1, length(cses), j);
         hold on;
