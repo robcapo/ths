@@ -28,25 +28,23 @@ classdef ParzenWindowSampler < CoreSupportExtractor
             
             d = zeros(size(data, 1), 1);
             
-            for i = 1:length(data)
+            dists = exp(-pdist2(data, data, 'mahalanobis', diag(sigma)));
+            
+            for i = 1:size(data, 1)
                 mu = data(i, :);
                 
                 minBox = repmat(mu - sigma / 2, size(data, 1), 1);
                 maxBox = repmat(mu + sigma / 2, size(data, 1), 1);
                 
-                X = data( ...
-                    all([data > minBox, data < maxBox], 2), ...
-                    : ...
-                );
-            
-                X(ismember(X, mu, 'rows'), :) = [];
+                dist = dists(all([data > minBox, data < maxBox], 2), i);
+                dist(dist == 0) = [];
                 
-                if size(X, 1) < obj.nMin
+                if size(dist, 1) < obj.nMin
                     d(i) = 0;
                     continue;
                 end
                 
-                d(i) = mean(exp(-pdist2(X, mu, 'mahalanobis', diag(sigma))));
+                d(i) = mean(dist);
                 
             end
             
