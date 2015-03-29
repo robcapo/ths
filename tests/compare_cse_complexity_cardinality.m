@@ -9,6 +9,7 @@ results = cell(length(Ns), 1);
 
 warning('off', 'stats:gmdistribution:FailedToConverge');
 
+delete(gcp('nocreate'));
 pool = parpool(feature('numCores'));
 try
     parfor i = 1:length(Ns)
