@@ -3,14 +3,17 @@ classdef COMPOSE < ClassifierModel
     %   Detailed explanation goes here
     
     properties (SetAccess = protected)
+        % Dependencies
         classifier;
         core_support_extractor;
         
-        autoExtract = 1; % extract every time classify is called 0
-        classifyCount = 0; % number of times classify has been called since last extraction
-        
+        % Data
         X = [];
         y = [];
+        classifyCount = 0; % number of times classify has been called since last extraction
+        
+        % Options
+        autoExtract = 1; % extract every time classify is called 0
     end
     
     methods
@@ -23,10 +26,10 @@ classdef COMPOSE < ClassifierModel
                 error('ths:COMPOSE:BadSSL', 'ssl must be an implementation of SemiSupervisedClassifier');
             end
             
-            obj.classifier = cse;
-            obj.ssl = ssl;
+            obj.core_support_extractor = cse;
+            obj.classifier = ssl;
             
-            if isfield(opts, 'extractEvery'), obj.extractEvery = opts.extractEvery; end
+            if isfield(opts, 'autoExtract'), obj.autoExtract = opts.autoExtract; end
         end
         
         function train(obj, X, y, ~)
@@ -36,10 +39,14 @@ classdef COMPOSE < ClassifierModel
         
         function h = classify(obj, X, ~)
             h = obj.classifier.classify(obj.X, obj.y, X);
+            obj.X = [];
+            obj.y = [];
+            obj.train(X, h);
+            
             obj.classifyCount = obj.classifyCount + 1;
             
             if obj.classifyCount == obj.autoExtract
-                obj.y = obj.extract();
+                obj.extract();
             end
         end
         
@@ -48,16 +55,19 @@ classdef COMPOSE < ClassifierModel
             
             classes = unique(obj.y);
             
+            supports = zeros(size(obj.y));
+            
             for i = 1:length(classes)
-                inds = obj.y == classes(i);
+                inds = find(obj.y == classes(i));
                 x = obj.X(inds, :);
                 
                 cs = obj.core_support_extractor.extract(x);
                 
-                inds(cs) = [];
-                obj.x(inds, :) = [];
-                obj.y(inds) = [];
+                supports(inds(cs)) = 1;
             end
+            
+            obj.X = obj.X(supports == 1, :);
+            obj.y = obj.y(supports == 1);
         end
     end
     
