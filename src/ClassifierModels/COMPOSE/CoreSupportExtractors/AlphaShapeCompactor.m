@@ -2,8 +2,12 @@ classdef AlphaShapeCompactor < CoreSupportExtractor
     %ALPHASHAPECOMPACTOR Summary of this class goes here
     %   Detailed explanation goes here
     
-    properties
+    properties (SetAccess = private)
         alpha = 1;
+    end
+    
+    properties (SetAccess = private, GetAccess = private)
+        extractCalled = 0
     end
     
     methods
@@ -15,63 +19,74 @@ classdef AlphaShapeCompactor < CoreSupportExtractor
         end
         
         function inds = extract(obj, data)
-            inds = [];
-            
-            ashape = obj.createAlphaShape(data);
+            try
+                inds = [];
 
-            if isempty(ashape)
-                display('No Alpha Shape could be constructed try different alpha or check data');
-                return;
-            end
-            
-            N = size(data, 1);
-            N_core_supports = ceil(N*obj.p);
-            
-            while true
-                simplexInds = find(ashape.include == 1);
-                simplexes = ashape.simplexes(simplexInds, :);
-                
-                % index of simplex that each d-1 simplex comes from
-                edgeID = repmat( ...
-                    simplexInds, ...
-                    size(simplexes, 2), ...
-                    1 ...
-                );
+                ashape = obj.createAlphaShape(data);
 
-                % find d-1 simplexes
-                edges = zeros(size(simplexes, 1) * size(simplexes, 2), size(simplexes, 2) - 1);
-                cols = 1:size(simplexes,2);
-                for i = 1:size(ashape.simplexes,2)
-                    % Append all but one column from the d simplexes matrix to the d-1 simplexes matrix
-                    edges((i-1)*size(simplexes, 1) + 1:i*size(simplexes, 1), :) = ...
-                        simplexes(:, cols(1:size(simplexes,2)-1));
-                    
-                    % Change the column that is being removed
-                    cols = circshift(cols,[0 1]);    
+                if isempty(ashape)
+                    display('No Alpha Shape could be constructed try different alpha or check data');
+                    return;
                 end
 
-                % sort edges so that it's easy to find duplicates
-                edges = sort(edges, 2);
-                [edges, Sid] = sortrows(edges);
-                edgeID = edgeID(Sid);
+                N = size(data, 1);
+                N_core_supports = ceil(N*obj.p);
 
-                % find duplicate edges
-                diff_edges = [1; sum(abs(diff(edges)), 2)];
-                diff_edges(find(diff_edges == 0) - 1) = 0;
-                
-                ashape.include(edgeID(diff_edges ~= 0)) = 0;
-                points_remaining = unique(ashape.simplexes(ashape.include==1));
-                
-                if numel(points_remaining) < N_core_supports
-                    if isempty(inds)
-                        warning('No samples selected. Increasing \alpha');
-                        obj.alpha = obj.alpha * 1.1;
-                        inds = obj.extract(data);
+                while true
+                    simplexInds = find(ashape.include == 1);
+                    simplexes = ashape.simplexes(simplexInds, :);
+
+                    % index of simplex that each d-1 simplex comes from
+                    edgeID = repmat( ...
+                        simplexInds, ...
+                        size(simplexes, 2), ...
+                        1 ...
+                    );
+
+                    % find d-1 simplexes
+                    edges = zeros(size(simplexes, 1) * size(simplexes, 2), size(simplexes, 2) - 1);
+                    cols = 1:size(simplexes,2);
+                    for i = 1:size(ashape.simplexes,2)
+                        % Append all but one column from the d simplexes matrix to the d-1 simplexes matrix
+                        edges((i-1)*size(simplexes, 1) + 1:i*size(simplexes, 1), :) = ...
+                            simplexes(:, cols(1:size(simplexes,2)-1));
+
+                        % Change the column that is being removed
+                        cols = circshift(cols,[0 1]);    
                     end
-                    break;
+
+                    % sort edges so that it's easy to find duplicates
+                    edges = sort(edges, 2);
+                    [edges, Sid] = sortrows(edges);
+                    edgeID = edgeID(Sid);
+
+                    % find duplicate edges
+                    diff_edges = [1; sum(abs(diff(edges)), 2)];
+                    diff_edges(find(diff_edges == 0) - 1) = 0;
+
+                    ashape.include(edgeID(diff_edges ~= 0)) = 0;
+                    points_remaining = unique(ashape.simplexes(ashape.include==1));
+
+                    if numel(points_remaining) < N_core_supports
+                        if isempty(inds)
+                            warning('No samples selected. Increasing \alpha');
+                            disp(ashape);
+                            obj.alpha = obj.alpha * 1.1;
+                            inds = obj.extract(data);
+                        end
+                        break;
+                    end
+
+                    inds = points_remaining;
+                end
+            catch e
+                disp('Error occurred. Dumping workspace');
+                ws_ = who;
+                for z_ = 1:length(ws_)
+                    eval(sprintf('disp(%s)', ws_{z}))
                 end
                 
-                inds = points_remaining;
+                rethrow e;
             end
         end
         
