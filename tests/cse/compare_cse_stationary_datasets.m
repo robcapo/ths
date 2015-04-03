@@ -4,7 +4,7 @@ function compare_cse_stationary_datasets( datasets, cses )
 
 warning('off', 'stats:gmdistribution:FailedToConverge');
 
-if ~iscell(datasets), datasets = {datasets}; end
+if ~iscell(datasets), datasets = {datasets, {}, ''}; end
 if ~iscell(cses), cses = {cses}; end
 
 for i = 1:size(datasets, 1)
@@ -18,7 +18,7 @@ for i = 1:size(datasets, 1)
     
     
     figure('Name', datasets{i, 3});
-    for j = 1:length(cses)
+    for j = 1:size(cses, 1)
         disp(['Extracting with: ' cses{j, 2}]);
         cse = cses{j, 1};
         tic;
@@ -26,7 +26,7 @@ for i = 1:size(datasets, 1)
         dur = toc;
         disp(['Extraction took: ' num2str(dur) ' seconds.']);
         
-        subplot(1, length(cses), j);
+        subplot(1, size(cses, 1), j);
         hold on;
         scatter(x, y, 'k.');
         scatter(x(inds), y(inds), 'r*');
