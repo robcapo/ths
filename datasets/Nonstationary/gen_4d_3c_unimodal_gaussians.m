@@ -17,11 +17,11 @@ function dataset = gen_4d_3c_unimodal_gaussians()
            % disp(i);
             k=k*-1;
         end
-        xm1 = 3.6*cos(t1);
-        ym1 = 3.6*sin(t1);
+        xm1 = 3.7*cos(t1);
+        ym1 = 3.7*sin(t1);
 
-        xm2 = 3.6*cos(t2);
-        ym2 = 3.6*sin(t2);
+        xm2 = 3.7*cos(t2);
+        ym2 = 3.7*sin(t2);
         
         xm3 = xm3+.11*k;
         ym3 = 0;
@@ -39,7 +39,7 @@ function dataset = gen_4d_3c_unimodal_gaussians()
         RNDtr = mvnrnd(mu1,eye(4),n);
         RNDtr2 = mvnrnd(mu2,eye(4),n);
         RNDtr3 = mvnrnd(mu3,eye(4),n);
-        RNDtr4 = mvnrnd(mu4,eye(4),n);
+        RNDtr4 = mvnrnd(mu4,eye(4),n);{
         
         data = [RNDtr;RNDtr2;RNDtr3;RNDtr4];
         
