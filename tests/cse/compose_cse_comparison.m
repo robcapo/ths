@@ -26,14 +26,14 @@ for i = 1:length(cses)
         labels = dataset.labels{j};
         perf = 0;
         
-        dur = 0;
+        dur{j} = 0;
         if ~isempty(cs)
             trainData = data(cs, :);
             trainLabels = labels(cs, :);
         
             tic;
             c.train(trainData, trainLabels, 1);
-            dur = dur + toc;
+            dur{j} = dur{j} + toc;
         end
         
         if ~isempty(ts)
@@ -41,7 +41,7 @@ for i = 1:length(cses)
             
             tic;
             h{j} = c.classify(testData, j);
-            dur = dur + toc;
+            dur{j} = dur{j} + toc;
             
             perf = sum(h{j} == labels(ts)) / sum(ts);
             
@@ -59,7 +59,6 @@ for i = 1:length(cses)
                 pause;
             end
         end
-        dur{j} = toc(z);
         
         disp(['COMPOSE with ' classes{i} ' finished timestep ' num2str(j) ' in ' num2str(dur{j}) 's and perf ' num2str(perf) '.']);
     end
