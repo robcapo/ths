@@ -5,6 +5,9 @@ if ~iscell(cses), cses = {cses}; end
 if nargin < 4, opts = struct; end
 if nargin < 3, ssl = LabelPropagator; end
 
+if ~isfield(opts, 'autoExtract'), opts.autoExtract = 0; end
+if ~isfield(opts, 'debug'), opts.debug = 0; end
+
 classes = cellfun(@class, cses, 'UniformOutput', false);
 results = struct('CSEClass', classes);
 
@@ -21,22 +24,44 @@ for i = 1:length(cses)
 
         data = dataset.data{j};
         labels = dataset.labels{j};
+        perf = 0;
         
-        z = tic;
+        dur = 0;
         if ~isempty(cs)
             trainData = data(cs, :);
             trainLabels = labels(cs, :);
         
+            tic;
             c.train(trainData, trainLabels, 1);
+            dur = dur + toc;
         end
         
         if ~isempty(ts)
             testData = data(ts, :);
+            
+            tic;
             h{j} = c.classify(testData, j);
+            dur = dur + toc;
+            
+            perf = sum(h{j} == labels(ts)) / sum(ts);
+            
+            if opts.debug == 1
+                gscatter(c.X(:, 1), c.X(:, 2), c.y, 'brg', '.');
+                title('Classified');
+                pause;
+            end
+
+            c.extract();
+            
+            if opts.debug == 1
+                gscatter(c.X(:, 1), c.X(:, 2), c.y, 'brg', '*');
+                title('Extracted');
+                pause;
+            end
         end
         dur{j} = toc(z);
         
-        disp(['COMPOSE with ' classes{i} ' finished timestep ' num2str(j) ' in ' num2str(dur{j}) 's.']);
+        disp(['COMPOSE with ' classes{i} ' finished timestep ' num2str(j) ' in ' num2str(dur{j}) 's and perf ' num2str(perf) '.']);
     end
     
     results(i).duration = dur;
