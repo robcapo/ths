@@ -14,15 +14,41 @@ classdef LabelPropagator < SemiSupervisedClassifier
         end
         
         function h = classify(obj, Xl, yl, Xu)
-            T = exp(-pdist2(Xu, [Xl; Xu], 'mahalanobis', obj.sigma*eye(size(Xl, 2))));
-            T = T ./ repmat(sum(T, 1), size(T, 1), 1);
+            data = [Xl; Xu];
+            n_instances = size(data, 1);
+            n_features = size(data, 2);
+            n_labeled = length(yl);
+            labels = full(ind2vec(yl'))';
+            labels = [labels; zeros(size(Xu, 1), size(labels, 2))];
             
-            Tul = T(:, 1:size(Xl, 1));
-            Tuu = T(:, size(Xl, 1)+1:end);
+            a = reshape(data,1,n_instances,n_features);
+            b = reshape(data,n_instances,1,n_features);
+            W = exp(-sum((a(ones(n_instances,1),:,:) - b(:,ones(n_instances,1),:)).^2,3)/(obj.sigma^2));
+
+            % The probabilty to jump from node j to i : T_ij = P(j->i)
+            T = W./repmat(sum(W),n_instances,1); %Column Normalize W
+            T(isnan(T)) = 0;             % Convert any NaNs to zero elements
+
+            % Normalize the transisiton matrix and truncate small elements (1e-5)
+            Tn = pinv(diag(sum(T,2)))*T; % Row Normalize T
+            Tn(Tn<1e-5)=0;               % Removing small elements increases speed
+
+            % We refer to differenct segements of the matrices as follows:
+            % Tn = [Tll Tlu     Y = [Yl
+            %       Tul Tuu]         Yu]
+            %
+            % Break the normalized transisiton matrix into its components
+            Tul = Tn(n_labeled+1:end, 1:n_labeled);     %Grab lower left corner of normalized transition matrix
+            Tuu = Tn(n_labeled+1:end, n_labeled+1:end);   %Grab lower right corner of normalized transition matrix
+
             
-            Z = pinv((eye(size(Tuu))-Tuu))*Tul*full(ind2vec(yl'))';
+            % CONVERGENCE THEOREM METHOD:
+            % Refernce paper for entire proof
+            % YU_pr = (eye(size(Tuu))-Tuu)\Tul*YL; % prob. of belonging to each class
+            Z = pinv((eye(size(Tuu))-Tuu))*Tul*labels(1:n_labeled,:);
+            labels(n_labeled+1:end,:) = Z;
             
-            h = vec2ind(Z')';
+            [~, h] = max(labels(n_labeled+1:end, :), [], 2);
         end
     end
     
