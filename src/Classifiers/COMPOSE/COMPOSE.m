@@ -18,6 +18,8 @@ classdef COMPOSE < ClassifierModel
     
     methods
         function obj = COMPOSE(cse, ssl, opts)
+            if nargin < 3, opts = struct; end
+            
             if ~isa(cse, 'CoreSupportExtractor')
                 error('ths:COMPOSE:BadCSE', 'cse must be an implementation of CoreSupportExtractor');
             end
