@@ -50,7 +50,7 @@ classdef ParzenWindowSampler < CoreSupportExtractor
             
             [~, inds] = sort(d, 'descend');
             
-            inds = inds(1:min(length(inds), obj.p*length(inds)));
+            inds = inds(1:min(length(inds), round(obj.p*length(inds))));
         end
     end
     
