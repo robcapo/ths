@@ -17,27 +17,27 @@ classdef ParzenWindowSampler < CoreSupportExtractor
         
         function inds = extract(obj, data)
             if size(obj.sigma, 2) == 1
-                sigma = obj.sigma * ones(1, size(data, 2));
+                sig = obj.sigma * ones(1, size(data, 2));
             else
                 if size(obj.sigma, 2) ~= size(data, 2)
                     error('ths:BadOption', 'Sigma must be scalar or the same dimensionality as data');
                 end
                 
-                sigma = obj.sigma;
+                sig = obj.sigma;
             end
             
             d = zeros(size(data, 1), 1);
             
-            dists = exp(-pdist2(data, data, 'mahalanobis', diag(sigma)));
+            dists = exp(-pdist2(data, data, 'mahalanobis', diag(sig)));
             
             for i = 1:size(data, 1)
                 mu = data(i, :);
                 
-                minBox = repmat(mu - sigma / 2, size(data, 1), 1);
-                maxBox = repmat(mu + sigma / 2, size(data, 1), 1);
+                minBox = repmat(mu - sig / 2, size(data, 1), 1);
+                maxBox = repmat(mu + sig / 2, size(data, 1), 1);
                 
                 dist = dists(all([data > minBox, data < maxBox], 2), i);
-                dist(dist == 0) = [];
+                dist(dist == 0) = []; % remove center point so it doesn't improve average for small number of points
                 
                 if size(dist, 1) < obj.nMin
                     d(i) = 0;
@@ -50,7 +50,7 @@ classdef ParzenWindowSampler < CoreSupportExtractor
             
             [~, inds] = sort(d, 'descend');
             
-            inds = inds(1:min(length(inds), round(obj.p*length(inds))));
+            inds = inds(1:round(obj.p*end));
         end
     end
     
