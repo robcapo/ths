@@ -1,7 +1,7 @@
 function [ dataset ] = sinusoidal_gaussians( c, f, dx, A, N, T, l )
 if nargin < 7, l = 30; end
 if nargin < 6, T = 100; end
-if nargin < 5, N = 2000; end
+if nargin < 5, N = 500; end
 if nargin < 4, A = 4; end
 if nargin < 3, dx = 2.7; end
 if nargin < 2, f = 0.08; end

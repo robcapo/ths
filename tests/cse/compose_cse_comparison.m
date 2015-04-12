@@ -26,6 +26,7 @@ for i = 1:length(cses)
         labels = dataset.labels{j};
         perf = 0;
         
+        disp(['Starting on data with ' num2str(size(data, 1)) ' observations in ' num2str(size(data, 2)) ' dimensions'])
         dur{j} = 0;
         if ~isempty(cs)
             trainData = data(cs, :);
@@ -41,7 +42,7 @@ for i = 1:length(cses)
             
             tic;
             h{j} = c.classify(testData, j);
-            dur{j} = dur{j} + toc;
+            disp(['Classification took ' num2str(toc) 's.']);
             
             perf = sum(h{j} == labels(ts)) / sum(ts);
             
@@ -51,7 +52,9 @@ for i = 1:length(cses)
                 pause;
             end
 
+            tic;
             c.extract();
+            dur{j} = dur{j} + toc;
             
             if opts.debug == 1
                 gscatter(c.X(:, 1), c.X(:, 2), c.y, 'brg', '*');
