@@ -14,8 +14,11 @@ classdef GMMDensitySampler < CoreSupportExtractor
         end
         
         function inds = extract(obj, data)
+            if numel(data) == 0, inds = []; return; end
+            if size(data, 1) <= size(data, 2), inds = (1:size(data, 1))'; return; end
+            
             bestGMM = [];
-            for i = 1:length(obj.k)
+            for i = 1:min(length(obj.k), size(data, 1) - 1)
                 k = obj.k(i);
                 
                 gmm = fitgmdist(data, k, 'RegularizationValue', .01);
