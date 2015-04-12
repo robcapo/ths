@@ -39,9 +39,9 @@ function dataset = gen_4d_3c_unimodal_gaussians()
         RNDtr = mvnrnd(mu1,eye(4),n);
         RNDtr2 = mvnrnd(mu2,eye(4),n);
         RNDtr3 = mvnrnd(mu3,eye(4),n);
-        RNDtr4 = mvnrnd(mu4,eye(4),n);{
+        RNDtr4 = mvnrnd(mu4,eye(4),n);
         
-        data = [RNDtr;RNDtr2;RNDtr3;RNDtr4];
+        data = [RNDtr; RNDtr2; RNDtr3; RNDtr4];
         
         pdfs = zeros(length(data), 4);
         
