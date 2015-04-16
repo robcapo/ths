@@ -13,6 +13,7 @@ classdef ParzenWindowSampler < CoreSupportExtractor
             
             if isfield(opts, 'sigma'), obj.sigma = opts.sigma; end
             if isfield(opts, 'nMin'), obj.nMin = opts.nMin; end
+            if isfield(opts, 'p'), obj.p = opts.p; end
         end
         
         function inds = extract(obj, data)

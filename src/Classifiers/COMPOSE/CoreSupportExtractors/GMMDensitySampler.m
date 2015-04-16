@@ -11,6 +11,7 @@ classdef GMMDensitySampler < CoreSupportExtractor
             if nargin < 1, opts = struct; end
             
             if isfield(opts, 'k'), obj.k = opts.k; end
+            if isfield(opts, 'p'), obj.p = opts.p; end
         end
         
         function inds = extract(obj, data)

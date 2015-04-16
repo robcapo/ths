@@ -26,7 +26,7 @@ classdef LabelPropagator < SemiSupervisedClassifier
             W = exp(-sum((a(ones(n_instances,1),:,:) - b(:,ones(n_instances,1),:)).^2,3)/(obj.sigma^2));
 
             % The probabilty to jump from node j to i : T_ij = P(j->i)
-            T = W./repmat(sum(W),n_instances,1); %Column Normalize W
+            T = W ./ repmat(sum(W), n_instances, 1); %Column Normalize W
             T(isnan(T)) = 0;             % Convert any NaNs to zero elements
 
             % Normalize the transisiton matrix and truncate small elements (1e-5)
