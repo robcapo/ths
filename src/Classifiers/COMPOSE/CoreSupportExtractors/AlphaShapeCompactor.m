@@ -69,10 +69,8 @@ classdef AlphaShapeCompactor < CoreSupportExtractor
 
                     if numel(points_remaining) < N_core_supports
                         if isempty(inds)
-                            warning('No samples selected. Increasing \alpha');
-                            disp(ashape);
-                            obj.alpha = obj.alpha * 1.1;
-                            inds = obj.extract(data);
+                            warning('No samples selected. Returning all data.');
+                            inds = (1:size(data, 1))';
                         end
                         break;
                     end
