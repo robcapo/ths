@@ -6,7 +6,7 @@ ncses = length(cses);
 for i = 1:folds
     datasets(i) = dataset;
     use = randperm(length(datasets(i).use{1}));
-    use = use(1:19);
+    use = use(1:min(19, end));
     datasets(i).use{1} = zeros(size(datasets(i).use{1}));
     datasets(i).use{1}(use) = 1;
 end

@@ -8,33 +8,33 @@ results = struct;
 h = cell(length(dataset.data), 1);
 dur = cell(length(dataset.data), 1);
 
-for j = 1:length(dataset.data)
-    cs = dataset.use{j} == 1;
-    ts = dataset.use{j} == 0;
+for i = 1:size(dataset.data, 1)
+    cs = dataset.use{i} == 1;
+    ts = dataset.use{i} == 0;
 
-    data = dataset.data{j};
-    labels = dataset.labels{j};
+    data = dataset.data{i};
+    labels = dataset.labels{i};
     perf = 0;
 
     disp(['Starting on data with ' num2str(size(data, 1)) ' observations in ' num2str(size(data, 2)) ' dimensions'])
-    dur{j} = 0;
-    if ~isempty(cs)
+    dur{i} = 0;
+    if sum(cs) > 0
         trainData = data(cs, :);
         trainLabels = labels(cs, :);
 
         tic;
         c.train(trainData, trainLabels, 1);
-        dur{j} = dur{j} + toc;
+        dur{i} = dur{i} + toc;
     end
 
-    if ~isempty(ts)
+    if sum(ts) > 0
         testData = data(ts, :);
 
         tic;
-        h{j} = c.classify(testData, j);
+        h{i} = c.classify(testData, i);
         disp(['Classification took ' num2str(toc) 's.']);
 
-        perf = sum(h{j} == labels(ts)) / sum(ts);
+        perf = sum(h{i} == labels(ts)) / sum(ts);
 
         if opts.debug == 1
             gscatter(c.X(:, 1), c.X(:, 2), c.y, 'brg', '.');
@@ -45,7 +45,7 @@ for j = 1:length(dataset.data)
         if c.autoExtract == 0
             tic;
             c.extract();
-            dur{j} = dur{j} + toc;
+            dur{i} = dur{i} + toc;
         end
 
         if opts.debug == 1
@@ -56,7 +56,7 @@ for j = 1:length(dataset.data)
     end
 
     disp(['COMPOSE with ' class(c.core_support_extractor) ' and ' class(c.classifier) ...
-        ' finished timestep ' num2str(j) ' in ' num2str(dur{j}) 's and perf ' num2str(perf) '.']);
+        ' finished timestep ' num2str(i) ' in ' num2str(dur{i}) 's and perf ' num2str(perf) '.']);
 end
 
 results.CSEClass = class(c.core_support_extractor);
