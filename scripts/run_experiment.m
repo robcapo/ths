@@ -54,24 +54,52 @@ for i = 1:length(report.tTe)
         getframe;
     end
     
-    if h ~= y
-        Xk = learner.lastKnnX;
-        Yk = learner.lastKnnY;
-        [~, yk] = max(Yk, [], 2);
-        tk = learner.lastKnnT;
-        dk = learner.lastKnnD;
-        
-        fh = figure;
-        hold on;
-        gscatter(Xk(:, 1), Xk(:, 2), yk);
-        for j = 1:length(Xk)
-            text(Xk(j, 1), Xk(j, 2), dk(j), mat2str([dk(j), abs(t - tk(j))], 2));
+    if h ~= y && learner.lastSampleUsedForTraining == 1
+        disp('Misclassified and trained');
+        if 1
+            Xk = learner.lastKnnX;
+            Yk = learner.lastKnnY;
+            [~, yk] = max(Yk, [], 2);
+            tk = learner.lastKnnT;
+            dk = learner.lastKnnD;
+
+            fh = figure;
+            hold on;
+            gscatter(Xk(:, 1), Xk(:, 2), yk, 'rgbcmyk');
+            gscatter(report.XTr(:, 1), report.XTr(:, 2), report.yTr, 'rgbcmyk', '.', 1);
+            gscatter(report.XTe(1:i, 1), report.XTe(1:i, 2), report.yTe(1:i), 'rgbcmyk', '.', 1);
+%             for j = 1:length(Xk)
+%                 text(Xk(j, 1), Xk(j, 2), dk(j), mat2str([dk(j), abs(t - tk(j))], 2));
+%             end
+            zlim([0 max(dk)]);
+            scatter(x(:, 1), x(:, 2), 'k*');
+            title(mat2str(learner.lastY, 2));
+            hold off;
+            close(fh);
         end
-        zlim([0 max(dk)]);
-        scatter(x(:, 1), x(:, 2), 'k*');
-        title(mat2str(learner.lastY, 2));
-        hold off;
-        close(fh);
+    elseif h == y && learner.lastSampleUsedForTraining == 0
+        disp('Correctly classified but not trained');
+        if 1
+            Xk = learner.lastKnnX;
+            Yk = learner.lastKnnY;
+            [~, yk] = max(Yk, [], 2);
+            tk = learner.lastKnnT;
+            dk = learner.lastKnnD;
+
+            fh = figure;
+            hold on;
+            gscatter(Xk(:, 1), Xk(:, 2), yk, 'rgbcmyk');
+            gscatter(report.XTr(:, 1), report.XTr(:, 2), report.yTr, 'rgbcmyk', '.', 1);
+            gscatter(report.XTe(1:i, 1), report.XTe(1:i, 2), report.yTe(1:i), 'rgbcmyk', '.', 1);
+%             for j = 1:length(Xk)
+%                 text(Xk(j, 1), Xk(j, 2), dk(j), mat2str([dk(j), abs(t - tk(j))], 2));
+%             end
+            zlim([0 max(dk)]);
+            scatter(x(:, 1), x(:, 2), 'k*');
+            title(mat2str(learner.lastY, 2));
+            hold off;
+            close(fh);
+        end
     end
 end
 
