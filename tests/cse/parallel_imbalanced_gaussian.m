@@ -5,4 +5,6 @@ if nargin < 1, nMax = 5000; end
 parfor i = 1:10
     results(i) = imbalanced_gaussian(nMax, cases);
 end
+
+save('imablanced_data', 'results');
 end

@@ -38,6 +38,4 @@ warning('on');
 
 results.cses = cses;
 
-save('results/CSEComparison/imablanced_data', 'results');
-
 end
