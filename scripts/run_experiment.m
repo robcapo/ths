@@ -53,7 +53,9 @@ for i = 1:length(report.tTe)
         title('True');
         getframe;
     end
-    
+    if h ~= y
+        disp('Misclassified');
+    end
     if h ~= y && learner.lastSampleUsedForTraining == 1
         disp('Misclassified and trained');
         disp(['Predicted ' num2str(h) ' when true value was ' num2str(y)]);
@@ -66,9 +68,11 @@ for i = 1:length(report.tTe)
 
             fh = figure;
             hold on;
-            gscatter(Xk(:, 1), Xk(:, 2), yk, 'rgbcmyk');
-            gscatter(report.XTr(:, 1), report.XTr(:, 2), report.yTr, 'rgbcmyk', '.', 1);
-            gscatter(report.XTe(1:i, 1), report.XTe(1:i, 2), report.yTe(1:i), 'rgbcmyk', '+', 1);
+            c = [1 0 0; 0 1 0; 0 0 1; 1 1 0; 1 0 1; 0 1 1; 0 0 0];
+            
+            scatter(Xk(:, 1), Xk(:, 2), 25*pi, c(yk, :));
+            scatter(report.XTr(:, 1), report.XTr(:, 2), 15, c(report.yTr, :), '+');
+            scatter(report.XTe(1:i, 1), report.XTe(1:i, 2), 15, c(report.yTe(1:i), :), '+');
 %             for j = 1:length(Xk)
 %                 text(Xk(j, 1), Xk(j, 2), dk(j), mat2str([dk(j), abs(t - tk(j))], 2));
 %             end
