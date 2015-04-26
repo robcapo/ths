@@ -53,6 +53,9 @@ for i = 1:length(report.tTe)
         title('True');
         getframe;
     end
+    if h ~= y
+        disp('Misclassified');
+    end
     
     if h ~= y && learner.lastSampleUsedForTraining == 1
         disp('Misclassified and trained');
@@ -103,5 +106,7 @@ for i = 1:length(report.tTe)
         end
     end
 end
+
+disp(['Done. ' num2str(100*sum(report.h == report.yTe)/length(report.h)) '% accuracy']);
 
 end
