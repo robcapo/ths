@@ -56,6 +56,7 @@ for i = 1:length(report.tTe)
     if h ~= y
         disp('Misclassified');
     end
+    
     if h ~= y && learner.lastSampleUsedForTraining == 1
         disp('Misclassified and trained');
         disp(['Predicted ' num2str(h) ' when true value was ' num2str(y)]);
@@ -107,5 +108,7 @@ for i = 1:length(report.tTe)
         end
     end
 end
+
+disp(['Done. ' num2str(100*sum(report.h == report.yTe)/length(report.h)) '% accuracy']);
 
 end
