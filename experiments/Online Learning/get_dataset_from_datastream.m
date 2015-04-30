@@ -7,9 +7,11 @@ dataset = struct;
 t = linspace(0, datastream.tMax, N)';
 
 [X, y] = datastream.sample(t);
-
-dataset.X = chunkmat(X, batches);
-dataset.y = chunkmat(y, batches);
+use = zeros(size(y));
+dataset.data = chunkmat(X, batches);
+dataset.labels = chunkmat(y, batches);
+dataset.use  = chunkmat(use, batches);
+dataset.use{1} = ones(size(dataset.use{1}));
 
 end
 

@@ -78,13 +78,14 @@ classdef AlphaShapeCompactor < CoreSupportExtractor
                     inds = points_remaining;
                 end
             catch e
+                e.stack
                 disp('Error occurred. Dumping workspace');
                 ws_ = who;
                 for z_ = 1:length(ws_)
-                    eval(sprintf('disp(%s)', ws_{z}))
+                    eval(sprintf('disp(%s)', ws_{z_}))
                 end
                 
-                rethrow e;
+                rethrow(e);
             end
         end
         
