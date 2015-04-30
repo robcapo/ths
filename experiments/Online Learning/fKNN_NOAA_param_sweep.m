@@ -8,10 +8,7 @@ function results = fKNN_NOAA_param_sweep(betas, cores)
     inputs = cell(length(betas), 4);
     
     for i = 1:length(betas)
-        classifierOpts = struct;
-        classifierOpts.beta = betas(i);
-
-        inputs{i, 1} = ForgettingKnnClassifier(classifierOpts);
+        inputs{i, 1} = ForgettingKnnClassifier(struct('beta', betas(i)));
         inputs{i, 2} = X;
         inputs{i, 3} = y;
         inputs{i, 4} = t;
@@ -27,9 +24,12 @@ function results = fKNN_NOAA_param_sweep(betas, cores)
             results{i} = run_online_dataset(inputs{i, :});
         end
     catch e
+        save('results', 'results');
         delete(pool);
         rethrow(e);
     end
+    
+    save('results', 'results');
     
     delete(pool);
 end
