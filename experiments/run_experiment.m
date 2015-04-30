@@ -1,21 +1,35 @@
-function report = run_experiment(learner, datastream, n, plotterClassifier, plotterDataset)
+function report = run_experiment(learner, datastream, n, plotterClassifier, plotterDataset, additionalPlots)
+if nargin < 6, additionalPlots = 1; end
 if nargin < 5, plotterDataset = []; end
 if nargin < 4, plotterClassifier = []; end
 if nargin < 3, n = 1000; end
-
-nTr = n * .1;
 
 report = struct;
 report.learner = learner;
 report.datastream = datastream;
 
-report.tTr = linspace(0, nTr/n * datastream.tMax, nTr)';
-report.tTe = linspace((nTr + 1)/n, datastream.tMax, n)';
-report.h = zeros(size(report.tTe));
-report.dur = zeros(size(report.tTe));
-
-[report.XTr, report.yTr] = datastream.sample(report.tTr);
-[report.XTe, report.yTe] = datastream.sample(report.tTe);
+if isa(datastream, 'StreamingData')
+    nTr = n * .1;
+    
+    report.tTr = linspace(0, nTr/n * datastream.tMax, nTr)';
+    report.tTe = linspace((nTr + 1)/n, datastream.tMax, n)';
+    report.h = zeros(size(report.tTe));
+    report.dur = zeros(size(report.tTe));
+    
+    [report.XTr, report.yTr] = datastream.sample(report.tTr);
+    [report.XTe, report.yTe] = datastream.sample(report.tTe);
+elseif isstruct(datastream) && isfield(datastream, 'X') && isfield(datastream, 'y') && isfield(datastream, 't') && isfield(datastream, 'nTr')
+    report.XTr = datastream.X(1:datastream.nTr, :);
+    report.yTr = datastream.y(1:datastream.nTr);
+    report.tTr = datastream.t(1:datastream.nTr);
+    
+    report.XTe = datastream.X(datastream.nTr+1:end, :);
+    report.yTe = datastream.y(datastream.nTr+1:end);
+    report.tTe = datastream.t(datastream.nTr+1:end);
+    report.h = zeros(size(report.yTe));
+else
+    error('ths:InvalidDataset', 'Dataset must be an implementation of StreamingData or a struct with X, y, t, and nTr');
+end
 
 learner.train(report.XTr, report.yTr, report.tTr);
 
@@ -31,6 +45,11 @@ if ~isempty(plotterDataset)
     plotterDataset.plot(xTr, yTr);
 end
 
+report.incorrectTrainedY = [];
+report.incorrectTrainedX = [];
+report.correctUntrainedY = [];
+report.correctUntrainedX = [];
+
 for i = 1:length(report.tTe)
     x = report.XTe(i, :);
     y = report.yTe(i);
@@ -40,7 +59,7 @@ for i = 1:length(report.tTe)
     report.h(i) = learner.classify(x, t);
     report.dur(i) = toc;
     
-    [~, h] = max(learner.lastY, [], 2);
+    h = report.h(i);
     
     if ~isempty(plotterClassifier)
         plotterClassifier.plot(x, h);
@@ -60,7 +79,9 @@ for i = 1:length(report.tTe)
     if h ~= y && learner.lastSampleUsedForTraining == 1
         disp('Misclassified and trained');
         disp(['Predicted ' num2str(h) ' when true value was ' num2str(y)]);
-        if 1
+        
+        report.incorrectTrainedY = [report.incorrectTrainedY; learner.lastY];
+        if additionalPlots
             Xk = learner.lastKnnX;
             Yk = learner.lastKnnY;
             [~, yk] = max(Yk, [], 2);
@@ -85,7 +106,8 @@ for i = 1:length(report.tTe)
         end
     elseif h == y && learner.lastSampleUsedForTraining == 0
         disp('Correctly classified but not trained');
-        if 1
+        report.correctUntrainedY = [report.correctUntrainedY; learner.lastY];
+        if additionalPlots
             Xk = learner.lastKnnX;
             Yk = learner.lastKnnY;
             [~, yk] = max(Yk, [], 2);
@@ -110,5 +132,6 @@ for i = 1:length(report.tTe)
 end
 
 disp(['Done. ' num2str(100*sum(report.h == report.yTe)/length(report.h)) '% accuracy']);
+disp(['Mislabeled yet trained instances: ' num2str(length(report.incorrectTrainedY)) '. Correct, yet untrained instances: ' num2str(length(report.correctUntrainedY))]);
 
 end
