@@ -29,7 +29,7 @@ for i = 1:size(dataset.data, 1)
 
     if sum(ts) > 0
         testData = data(ts, :);
-
+        disp(['TS ' num2str(i) ' labels before classification ' mat2str(unique(c.y))]);
         tic;
         h{i} = c.classify(testData, i);
         disp(['Classification took ' num2str(toc) 's.']);
@@ -41,12 +41,16 @@ for i = 1:size(dataset.data, 1)
             title('Classified');
             pause;
         end
+        
+        disp(['TS ' num2str(i) ' labels after classification ' mat2str(unique(c.y))]);
 
         if c.autoExtract == 0
             tic;
             c.extract();
             dur{i} = dur{i} + toc;
         end
+        
+        disp(['TS ' num2str(i) ' labels after CSE ' mat2str(unique(c.y))]);
 
         if opts.debug == 1
             gscatter(c.X(:, 1), c.X(:, 2), c.y, 'brg', '*');
