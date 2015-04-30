@@ -4,17 +4,22 @@ classdef ForgettingKnnClassifier < ClassifierModel
     
     properties (SetAccess = protected)
         maxInd = 0; % current "end" of dynamic array
-        
-        X = []; % data
-        y = []; % labels
-        Y = []; % posteriors
-        t = []; % sample times
-        
         priors = [];
         
         d; % dimensions of data
         
         trainThreshold = .8;
+        
+        beta = 1;
+        k = 25;
+        rowPadding = 500;
+    end
+    
+    properties (Hidden, SetAccess = protected)
+        X = []; % data
+        y = []; % labels
+        Y = []; % posteriors
+        t = []; % sample times
         
         lastKnnX = [];
         lastKnnY = [];
@@ -36,19 +41,10 @@ classdef ForgettingKnnClassifier < ClassifierModel
         function obj = ForgettingKnnClassifier(opts)
             if nargin < 1, opts = struct; end
             
-            defaultOpts = struct;
-            defaultOpts.rowPadding = 500;
-            defaultOpts.beta = 1;
-            defaultOpts.k = 25;
-            
-            fields = fieldnames(defaultOpts);
-            for i = 1:length(fields)
-                if ~isfield(opts, fields{i})
-                    opts.(fields{i}) = defaultOpts.(fields{i});
-                end
-            end
-            
-            obj.opts = opts;
+            if isfield(opts, 'beta'          ), obj.beta = opts.beta; end
+            if isfield(opts, 'k'             ), obj.k = opts.k; end
+            if isfield(opts, 'rowPadding'    ), obj.rowPadding = opts.rowPadding; end
+            if isfield(opts, 'trainThreshold'), obj.trainThreshold = opts.trainThreshold; end
         end
     end
         
@@ -182,7 +178,7 @@ classdef ForgettingKnnClassifier < ClassifierModel
             
             d = pdist2(Xtr, x);
             
-            k = min(obj.maxInd, obj.opts.k);
+            k = min(obj.maxInd, obj.k);
             
             [~, dind] = sort(d);
             
@@ -202,14 +198,14 @@ classdef ForgettingKnnClassifier < ClassifierModel
             
             classPriors = obj.priors / sum(obj.priors, 2);
             
-            dt = exp(abs(t - ttr).^obj.opts.beta);
+            dt = exp(abs(t - ttr).^obj.beta);
             
             % Find order of nearest neighbors
             d = pdist2([Xtr, dt], [x, zeros(size(x, 1), 1)]);
             [~, dind] = sort(d);
             
             % Return k closest
-            k = min(obj.maxInd, obj.opts.k);
+            k = min(obj.maxInd, obj.k);
             dk = d(dind(1:k));
             Xk = Xtr(dind(1:k), :);
             Yk = Ytr(dind(1:k), :);
@@ -225,7 +221,7 @@ classdef ForgettingKnnClassifier < ClassifierModel
             unusedRows = size(obj.X, 1) - obj.maxInd;
             
             if unusedRows <= n
-                obj.allocateRows(n + obj.opts.rowPadding)
+                obj.allocateRows(n + obj.rowPadding)
             end
         end
         
