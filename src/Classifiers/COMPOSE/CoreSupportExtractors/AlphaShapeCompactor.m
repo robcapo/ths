@@ -35,6 +35,12 @@ classdef AlphaShapeCompactor < CoreSupportExtractor
                 while true
                     simplexInds = find(ashape.include == 1);
                     simplexes = ashape.simplexes(simplexInds, :);
+                    
+                    if isempty(simplexInds)
+                        warning('No samples selected. Returning all data.');
+                        inds = (1:size(data, 1))';
+                        return;
+                    end
 
                     % index of simplex that each d-1 simplex comes from
                     edgeID = repmat( ...
@@ -79,10 +85,10 @@ classdef AlphaShapeCompactor < CoreSupportExtractor
                 end
             catch e
                 e.stack
-                disp('Error occurred. Dumping workspace');
+                disp('Error occurred in AlphaShapeCompactor.extract(). Dumping workspace');
                 ws_ = who;
                 for z_ = 1:length(ws_)
-                    eval(sprintf('disp(%s)', ws_{z_}))
+                    eval(sprintf('disp(''%s = ''); disp(%s);', ws_{z_}, ws_{z_}))
                 end
                 
                 rethrow(e);
