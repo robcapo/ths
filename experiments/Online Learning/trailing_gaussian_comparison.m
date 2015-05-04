@@ -11,7 +11,6 @@ for i = 1:10
     fknnResults = run_online_experiment(datastream, fknn);
     composeResults = run_compose(c, dataset);
 
-
     fknnH = chunkmat(fknnResults.h, length(dataset.labels{1}));
     fknnY = chunkmat(fknnResults.y, length(dataset.labels{1}));
 
@@ -32,3 +31,4 @@ hold on;
 ciplot(fkl, fku, 1:length(fkl), 'b');
 ciplot(cl, cu, 1:length(cl), 'r');
 hold off;
+

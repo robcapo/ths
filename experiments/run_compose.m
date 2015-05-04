@@ -32,6 +32,7 @@ for i = 1:size(dataset.data, 1)
         disp(['TS ' num2str(i) ' labels before classification ' mat2str(unique(c.y))]);
         tic;
         h{i} = c.classify(testData, i);
+        dur{i} = dur{i} + toc;
         disp(['Classification took ' num2str(toc) 's.']);
 
         perf = sum(h{i} == labels(ts)) / sum(ts);
