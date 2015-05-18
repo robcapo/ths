@@ -18,19 +18,13 @@ classdef RotatingGaussians < StreamingData
         function obj = RotatingGaussians(opts)
             if nargin < 1, opts = struct; end
             
-            defaultOpts = struct;
             defaultOpts.n = 2;
             defaultOpts.priors = 1;
             defaultOpts.radius = 5;
             defaultOpts.sig = [1 0; 0 1];
             defaultOpts.rotationRates = 1;
             
-            fields = fieldnames(defaultOpts);
-            for i = 1:length(fields)
-                if ~isfield(opts, fields{i})
-                    opts.(fields{i}) = defaultOpts.(fields{i});
-                end
-            end
+            opts = struct_merge(defaultOpts, opts);
             
             obj.y = (1:opts.n)';
             obj.d = 2;
@@ -53,14 +47,18 @@ classdef RotatingGaussians < StreamingData
                 y = obj.chooseclass(t);
             end
             
-            angle = obj.rotateLin(t, obj.initialAngles(y), obj.rotationRates(y));
-            mu = [obj.radius*cos(angle), obj.radius*sin(angle)];
+            mu = obj.mu(t, y);
             
             x = zeros(length(y), obj.d);
             
             for i = 1:length(y)
                 x(i, :) = mvnrnd(mu(i, :), obj.covariances{y(i)}, 1);
             end
+        end
+        
+        function mu = mu(obj, t, y)
+            angle = obj.rotateLin(t, obj.initialAngles(y), obj.rotationRates(y));
+            mu = [obj.radius*cos(angle), obj.radius*sin(angle)];
         end
     end
     
