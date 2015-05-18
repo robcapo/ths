@@ -1,5 +1,6 @@
-bestK = 5;
-bestBeta = .2102;
+% Keystroke Dataset
+keystrokeBestK = 5;
+keystrokeBestBeta = .2102;
 
 best = 0;
 for beta = linspace(0.1, 1, 50)

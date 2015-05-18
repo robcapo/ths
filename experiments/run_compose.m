@@ -16,7 +16,11 @@ for i = 1:size(dataset.data, 1)
     labels = dataset.labels{i};
     perf = 0;
 
-    disp(['Starting on data with ' num2str(size(data, 1)) ' observations in ' num2str(size(data, 2)) ' dimensions'])
+    disp('Starting time step.');
+    
+    disp(['data: ' num2str(size(data, 1)) 'x' num2str(size(data, 2))]);
+    disp(['training data: ' num2str(size(c.X, 1)) ' rows']);
+    
     dur{i} = 0;
     if sum(cs) > 0
         trainData = data(cs, :);

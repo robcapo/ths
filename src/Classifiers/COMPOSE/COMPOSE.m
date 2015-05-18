@@ -14,6 +14,7 @@ classdef COMPOSE < ClassifierModel
         
         % Options
         autoExtract = 1; % extract every time classify is called 0
+        persistCoreSupports = 0;
     end
     
     methods
@@ -32,6 +33,7 @@ classdef COMPOSE < ClassifierModel
             obj.classifier = ssl;
             
             if isfield(opts, 'autoExtract'), obj.autoExtract = opts.autoExtract; end
+            if isfield(opts, 'persistCoreSupports'), obj.persistCoreSupports = opts.persistCoreSupports; end
         end
         
         function train(obj, X, y, ~)
@@ -41,8 +43,12 @@ classdef COMPOSE < ClassifierModel
         
         function h = classify(obj, X, ~)
             h = obj.classifier.classify(obj.X, obj.y, X);
-            obj.X = [];
-            obj.y = [];
+            
+            if obj.persistCoreSupports == 0
+                obj.X = [];
+                obj.y = [];
+            end
+            
             obj.train(X, h);
             
             obj.classifyCount = obj.classifyCount + 1;
