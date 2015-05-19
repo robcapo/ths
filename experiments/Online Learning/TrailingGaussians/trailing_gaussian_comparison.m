@@ -8,6 +8,7 @@ fknnOpts = struct;
 fknnPerfs = [];
 composePerfs = [];
 bayesPerfs = [];
+scargcPerfs = [];
 for i = 1:10
     fknn = ForgettingKnnClassifier(fknnOpts);
     c = COMPOSE(cse, LabelPropagator);
@@ -37,21 +38,24 @@ for i = 1:10
     fknnH = chunkmat(fknnResults.h, batchSize);
     fknnY = chunkmat(fknnResults.y, batchSize);
     bayesH = chunkmat(bayesH, batchSize);
+    scargcH = chunkmat(SCARGC_1NN(dataset, [], [], 3)', batchSize);
     
     
     bayesPerfs(:, i)   = cellfun(@percent_equal, bayesH(2:end), fknnY(2:end));
     fknnPerfs(:, i)    = cellfun(@percent_equal, fknnH(2:end), fknnY(2:end));
     composePerfs(:, i) = cellfun(@percent_equal, composeResults.h(2:end), dataset.labels(2:end));
+    scargcPerfs(:, i) = cellfun(@percent_equal, scargcH);
 end
 
 hold on;
 plot_confidence_intervals(bayesPerfs, 'm');
 plot_confidence_intervals(fknnPerfs, 'b');
 plot_confidence_intervals(composePerfs, 'r');
+plot_confidence_intervals(scargcPerfs, 'c');
 ylim([0 1]);
 ylabel('Performance');
 xlabel('Time step');
 title('Trailing Gaussian Experiment Results');
-legend({'Bayes', 'Forgetting kNN', 'COMPOSE'});
+legend({'Bayes', 'Forgetting kNN', 'COMPOSE', 'SCARGC'});
 hold off;
 
