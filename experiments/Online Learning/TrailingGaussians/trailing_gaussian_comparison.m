@@ -56,6 +56,6 @@ ylim([0 1]);
 ylabel('Performance');
 xlabel('Time step');
 title('Trailing Gaussian Experiment Results');
-legend({'Bayes', 'Forgetting kNN', 'COMPOSE', 'SCARGC'});
+legend({'Bayes', 'Forgetting kNN', 'COMPOSE', 'SCARGC1NN'});
 hold off;
 

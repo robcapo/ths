@@ -5,7 +5,7 @@
 %example: [vet_bin_acc, acc_final, ~] = SCARGC_1NN('MC-2C-2D.txt', 50, 300, 2)
 %To see the results over time: plot100Steps(vet_bin_acc, '-r')
 function [vet_bin_acc, acc_final, elapsedTime] = SCARGC_1NN(dataset, numini, max_pool_length, nK)
-    
+        
     %save time
     tic;
     if ischar(dataset)
