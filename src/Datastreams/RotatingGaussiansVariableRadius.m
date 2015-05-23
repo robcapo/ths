@@ -15,16 +15,17 @@ classdef RotatingGaussiansVariableRadius < RotatingGaussians
             
             obj = obj@RotatingGaussians(opts);
             
+            defaultOpts.radius = 5;
             defaultOpts.radiusFunction = @obj.sinRadius;
             defaultOpts.radiusVariance = 4.5;
             defaultOpts.radiusFrequency = 2;
             
             opts = struct_merge(defaultOpts, opts);
             
+            obj.radius = opts.radius;
             obj.radiusFunction = opts.radiusFunction;
             obj.radiusVariance = opts.radiusVariance;
             obj.radiusFrequency = opts.radiusFrequency;
-            
         end
         
         function mu = mu(obj, t, y)

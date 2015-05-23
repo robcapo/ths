@@ -198,7 +198,7 @@ classdef ForgettingKnnClassifier < ClassifierModel
             
             classPriors = obj.priors / sum(obj.priors, 2);
             
-            dt = exp(abs(t - ttr).^obj.beta);
+            dt = exp(abs(t - ttr)*obj.beta);
             
             % Find order of nearest neighbors
             d = pdist2([Xtr, dt], [x, zeros(size(x, 1), 1)]);

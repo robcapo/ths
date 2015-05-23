@@ -67,16 +67,25 @@ classifier.train(results.X_tr, results.y_tr, results.t_tr);
 disp(['Trianing took ' num2str(toc(tTr)) 's.']);
 
 
+results.trainedIncorrect = 0;
+results.notTrainedCorrect = 0;
 tTe = tic;
 for i = 1:size(results.X, 1)
     tStart = tic;
     results.h(i) = classifier.classify(results.X(i, :), results.t(i));
     results.dur(i) = toc(tStart);
     
+    if results.h(i) ~= results.y(i) && classifier.lastSampleUsedForTraining == 1
+        results.trainedIncorrect = results.trainedIncorrect + 1;
+    end
+    
+    if results.h(i) == results.y(i) && classifier.lastSampleUsedForTraining == 0
+        results.notTrainedCorrect = results.notTrainedCorrect + 1;
+    end
+    
     if mod(i, 500) == 0
         disp(['Classifying observation ' num2str(i) '. '...
             'Elapsed time: ' num2str(toc(tTe))]);
     end
 end
-
 end

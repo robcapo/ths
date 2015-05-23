@@ -4,8 +4,12 @@ n = 1000;
 batchSize = 25;
 cse = AlphaShapeCompactor;
 fknnOpts = struct;
-fknnOpts.k = 11;
-fknnOpts.beta = 1;
+fknnOpts.k = 5;
+fknnOpts.beta = 7;
+fknnOpts.trainThreshold = .65;
+
+datasetOpts = struct;
+datasetOpts.radiusVariance = 4;
 
 fknnPerfs = [];
 composePerfs = [];
@@ -14,7 +18,7 @@ scargcPerfs = [];
 for i = 1:10
     fknn = ForgettingKnnClassifier(fknnOpts);
     c = COMPOSE(cse, LabelPropagator);
-    datastream = RotatingGaussiansVariableRadius;
+    datastream = RotatingGaussiansVariableRadius(datasetOpts);
     dataset = get_dataset_from_datastream(datastream, n, batchSize);
     
     fknnResults = run_online_experiment(datastream, fknn, [], struct('N', n));
@@ -44,7 +48,7 @@ for i = 1:10
     bayesPerfs(:, i)   = cellfun(@percent_equal, bayesH(2:end), fknnY(2:end));
     fknnPerfs(:, i)    = cellfun(@percent_equal, fknnH(2:end), fknnY(2:end));
     composePerfs(:, i) = cellfun(@percent_equal, composeResults.h(2:end), dataset.labels(2:end));
-    scargcPerfs(:, i) = cellfun(@percent_equal, scargcH);
+    scargcPerfs(:, i)  = cellfun(@percent_equal, scargcH);
 end
 
 hold on;

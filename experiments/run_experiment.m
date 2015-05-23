@@ -1,5 +1,5 @@
 function report = run_experiment(learner, datastream, n, plotterClassifier, plotterDataset, additionalPlots)
-if nargin < 6, additionalPlots = 1; end
+if nargin < 6, additionalPlots = 0; end
 if nargin < 5, plotterDataset = []; end
 if nargin < 4, plotterClassifier = []; end
 if nargin < 3, n = 1000; end
@@ -76,7 +76,7 @@ for i = 1:length(report.tTe)
         disp('Misclassified');
     end
     
-    if h ~= y && learner.lastSampleUsedForTraining == 1
+    if isa(learner, 'ForgettingKnnClassifier') && h ~= y && learner.lastSampleUsedForTraining == 1
         disp('Misclassified and trained');
         disp(['Predicted ' num2str(h) ' when true value was ' num2str(y)]);
         
@@ -93,18 +93,28 @@ for i = 1:length(report.tTe)
             c = [1 0 0; 0 1 0; 0 0 1; 1 1 0; 1 0 1; 0 1 1; 0 0 0];
             
             scatter(Xk(:, 1), Xk(:, 2), 25*pi, c(yk, :));
-            scatter(report.XTr(:, 1), report.XTr(:, 2), 15, c(report.yTr, :), '+');
-            scatter(report.XTe(1:i, 1), report.XTe(1:i, 2), 15, c(report.yTe(1:i), :), '+');
-%             for j = 1:length(Xk)
-%                 text(Xk(j, 1), Xk(j, 2), dk(j), mat2str([dk(j), abs(t - tk(j))], 2));
-%             end
+            scatter(report.XTr(:, 1), report.XTr(:, 2), 15, c(report.yTr, :), 'o', 'filled');
+            scatter(report.XTe(1:i, 1), report.XTe(1:i, 2), 15, c(report.yTe(1:i), :), 'o', 'filled');
+            
+            [Xtr, yTr] = learner.getData();
+            scatter(Xtr(:, 1), Xtr(:, 2), 36, c(yTr, :), 'd');
+            
+            for j = 1:length(Xk)
+                text(Xk(j, 1), Xk(j, 2), dk(j), mat2str(abs(t - tk(j)), 2));
+            end
             zlim([0 max(dk)]);
-            scatter(x(:, 1), x(:, 2), 'k*');
+            scatter(x(:, 1), x(:, 2), 250, 'p', 'MarkerEdgeColor', c(h, :), 'MarkerFaceColor', c(y, :));
+            mu1 = datastream.mu(t, 1);
+            mu2 = datastream.mu(t, 2);
+            plot_circle(mu1(1), mu1(2), 3);
+            plot_circle(mu2(1), mu2(2), 3);
+            
             title(mat2str(learner.lastY, 2));
             hold off;
+%             pause;
             close(fh);
         end
-    elseif h == y && learner.lastSampleUsedForTraining == 0
+    elseif isa(learner, 'ForgettingKnnClassifier') && h == y && learner.lastSampleUsedForTraining == 0
         disp('Correctly classified but not trained');
         report.correctUntrainedY = [report.correctUntrainedY; learner.lastY];
         if additionalPlots
@@ -126,6 +136,7 @@ for i = 1:length(report.tTe)
             scatter(x(:, 1), x(:, 2), 'k*');
             title(mat2str(learner.lastY, 2));
             hold off;
+%             pause;
             close(fh);
         end
     end

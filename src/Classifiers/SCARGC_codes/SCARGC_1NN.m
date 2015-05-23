@@ -12,8 +12,8 @@ function [vet_bin_acc, acc_final, elapsedTime] = SCARGC_1NN(dataset, numini, max
         data = load(dataset);
     elseif isstruct(dataset)
         data = [cell2mat(dataset.data) cell2mat(dataset.labels)];
-        numini = sum(dataset.use{1});
-        max_pool_length = length(dataset.labels);
+        numini = sum(cellfun(@sum, dataset.use));
+        max_pool_length = length(dataset.labels{1});
     end
    
     initial_labeled_DATA = data(1:numini,1:end-1);
